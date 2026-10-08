@@ -426,3 +426,28 @@ FodyWeavers.xsd
 
 # Official VS Code C# Dev Kit Extension exclusion
 #*.lscache
+
+# --- Android / Gradle ---
+# Gradle
+.gradle/
+build/
+.kotlin/
+
+# Local SDK path (создаётся Android Studio)
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+captures/
+
+# Native build
+.externalNativeBuild/
+.cxx/
+
+# Прочие артефакты
+*.apk
+*.aab
+*.keystore
+*.jks
+.DS_Store
