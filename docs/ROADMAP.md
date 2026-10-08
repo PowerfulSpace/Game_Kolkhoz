@@ -17,9 +17,10 @@ markdown
 | Phase | Название | Модули | Статус |
 |-------|----------|--------|--------|
 | 0 | Каркас проекта | все | ✅ Завершена |
-| 1 | Domain: модели, правила, тесты | `domain` | 🔄 В работе |
+| 1 | Domain: модели, правила, тесты | `domain` | ✅ Завершена |
 | 2 | Data: Room, Repository | `data` | ⏳ Ожидает |
-| 3 | UI: экраны, компоненты | `app` | ⏳ Ожидает |
+| 3a | UI: тема + компоненты | `app` | ⏳ Ожидает |
+| 3b | UI: экраны | `app` | ⏳ Ожидает |
 | 4 | Связывание: ViewModel, навигация | `app` | ⏳ Ожидает |
 | 5 | Полировка, release | все | ⏳ Ожидает |
 
@@ -100,15 +101,15 @@ markdown
 
 **Definition of Done:**
 
-- [ ] Все модели и правила реализованы.
-- [ ] `./gradlew :domain:test` — BUILD SUCCESSFUL.
-- [ ] Минимум 20 тестов, все зелёные.
-- [ ] KDoc на всех публичных API.
-- [ ] Нет Android-импортов в `domain`.
-- [ ] Нет `System.currentTimeMillis()` в `domain`.
-- [ ] Нет `Random` в `domain`.
-- [ ] `SanityTest.kt` сохранён.
-- [ ] Код совпадает с `DOMAIN_MODEL.md`.
+- [x] Все модели и правила реализованы.
+- [x] `./gradlew :domain:test` — BUILD SUCCESSFUL.
+- [x] Минимум 20 тестов, все зелёные.
+- [x] KDoc на всех публичных API.
+- [x] Нет Android-импортов в `domain`.
+- [x] Нет `System.currentTimeMillis()` в `domain`.
+- [x] Нет `Random` в `domain`.
+- [x] `SanityTest.kt` сохранён.
+- [x] Код совпадает с `DOMAIN_MODEL.md`.
 
 **Отклонения, зафиксированные:**
 
@@ -118,8 +119,15 @@ markdown
   Это программная ошибка UI.
 - `streakPenaltyTargetId` добавлен в `GameState` для корректной 
   обработки серий.
+- Имена уникальны без учёта регистра и пробелов (trim + lowercase).
+- Ограничение длины имени: 1..32 символа.
+- `GameError` включает: `TooFewPlayers(actual)`, 
+  `TooManyPlayers(actual)`, `EmptyName(playerId)`, 
+  `DuplicateName(name)`, `NameTooLong(name, maxLength)`, 
+  `InvalidPositions(positions)`.
+- `position` валидируется в `createGame`: уникальны, 0..N-1.
 
-**Результат:** 🔄 В работе.
+**Результат:** ✅ Завершена. 52 теста, все зелёные.
 
 ---
 
@@ -132,6 +140,15 @@ markdown
 **Зависит от:** Phase 1 (нужны domain-модели).
 
 **Задачи:**
+
+0. **Интерфейс `GameRepository` в `domain/repository/`:**
+   - `suspend fun saveGame(game: Game)`
+   - `suspend fun loadGame(id: GameId): Game?`
+   - `fun observeActiveGame(): Flow<Game?>`
+   - `suspend fun loadAllGames(): List<Game>`
+   - `suspend fun deleteGame(id: GameId)`
+   - Финальный список методов — на этапе Phase 2, по мере 
+     реализации. Здесь — ориентир.
 
 1. **Room-сущности** (`data/db/entity/`):
    - `GameEntity`
@@ -152,9 +169,17 @@ markdown
    - `EventMapper` — `GameEventEntity` ↔ `GameEvent`
 
 5. **Repository:**
-   - Интерфейс `GameRepository` — в `domain` (или отдельный 
-     модуль `domain` — решается при реализации).
-   - Реализация `LocalGameRepository` — в `data`.
+   - Интерфейс `GameRepository` — в `domain/repository/`. 
+     Реализация `LocalGameRepository` — в `data/repository/`.
+
+     Обоснование: Dependency Inversion. Domain определяет, что 
+     ему нужно от хранилища, data — как это реализовано. Позволит 
+     позже добавить `RemoteGameRepository` без изменения domain.
+
+     ВАЖНО: `GameRepository` — единственное место в domain, где 
+     допустимы suspend-функции и `Flow`. Это контракт с внешним 
+     миром (persistence), а не правила игры. `GameRules` остаётся 
+     без suspend.
 
 6. **DI-модуль** (`data/di/`):
    - `DatabaseModule` — предоставляет `KolkhozDatabase`, DAO.
@@ -181,19 +206,21 @@ markdown
 
 ---
 
-## Phase 3 — UI (Compose)
+## Phase 3a — UI: тема + компоненты
 
-**Цель:** реализовать **все 5 экранов** по дизайн-системе.
+**Цель:** реализовать дизайн-систему и все переиспользуемые 
+компоненты. Без экранов.
 
 **Модуль:** `app`.
 
-**Зависит от:** Phase 1, Phase 2.
+**Зависит от:** Phase 1.
 
 **Задачи:**
 
 1. **Тема** (`app/ui/theme/`):
    - Цвета, типографика, отступы, радиусы — по `DESIGN_SYSTEM.md`.
-   - Токены — в одном месте.
+   - Токены — в одном месте (`KolhozColors`, `KolhozTypography`, 
+     `KolhozSpacing`, `KolhozRadius`).
 
 2. **Компоненты** (`app/ui/components/`):
    - `KolhozButton`, `KolhozSecondaryButton`, `KolhozTextButton`
@@ -203,27 +230,46 @@ markdown
    - `KolhozDialog`, `KolhozTopBar`, `KolhozBottomBar`
    - `PlayerInput`, `PlayerCountSelector`
 
-3. **Экраны** (`app/ui/`):
-   - `HomeScreen` — главный.
-   - `NewGameScreen` — создание.
-   - `GameScreen` — игровой (portrait + landscape).
-   - `HistoryScreen` — история ударов.
-   - `ResultScreen` — итоги.
+3. Compose Preview для каждого компонента.
+4. Никаких экранов.
 
-4. **Ресурсы:**
-   - Строки (`strings.xml`).
-   - Иконки (vector drawable).
-   - Ассеты (если нужны).
+**Definition of Done:**
+
+- [ ] Тема реализована по `DESIGN_SYSTEM.md`.
+- [ ] Все компоненты реализованы.
+- [ ] Compose Preview работает для каждого компонента.
+- [ ] Нет «магических чисел» — только токены.
+- [ ] `./gradlew assembleDebug` — BUILD SUCCESSFUL.
+
+**Результат:** ⏳ Ожидает.
+
+---
+
+## Phase 3b — UI: экраны
+
+**Цель:** собрать 5 экранов из компонентов Phase 3a.
+
+**Модуль:** `app`.
+
+**Зависит от:** Phase 3a.
+
+**Задачи:**
+
+1. `HomeScreen`.
+2. `NewGameScreen`.
+3. `GameScreen` (portrait + landscape).
+4. `HistoryScreen`.
+5. `ResultScreen`.
+6. Ресурсы: `strings.xml`, иконки (vector drawable).
+7. Compose UI tests — базовые сценарии.
 
 **Definition of Done:**
 
 - [ ] Все 5 экранов реализованы.
-- [ ] Все компоненты реализованы.
-- [ ] Тема соответствует `DESIGN_SYSTEM.md`.
-- [ ] Игровой экран работает в portrait и landscape.
-- [ ] Нет «магических чисел» — только токены.
+- [ ] GameScreen работает в portrait и landscape.
 - [ ] Скриншоты совпадают с макетами.
-- [ ] Compose UI tests — базовые сценарии.
+- [ ] Compose UI tests проходят.
+- [ ] `./gradlew assembleDebug` — BUILD SUCCESSFUL.
 
 **Результат:** ⏳ Ожидает.
 
@@ -319,6 +365,12 @@ markdown
    - Дописать все `docs/*.md`.
    - Проверить актуальность.
 
+9. **Локализация:**
+   - Только русский в MVP.
+   - Все строки — через `strings.xml`.
+   - Никаких хардкод-строк в Compose.
+   - Локализация на другие языки — v2+.
+
 **Definition of Done:**
 
 - [ ] `./gradlew assembleRelease` — BUILD SUCCESSFUL.
@@ -368,10 +420,9 @@ markdown
 
 ## Текущий статус
 
-**Сейчас:** Phase 1 (domain) — в работе.
+**Сейчас:** Phase 1 (domain) — завершена (52 теста, все зелёные).
 
-**Следующее:** после завершения Phase 1 и обновления документов — 
-Phase 2 (data).
+**Следующее:** Phase 2 (data) — Room, Repository.
 
 **P.S.** UI-документы (`DESIGN_SYSTEM.md`, `UI_SPEC.md`, 
 `SCREENS.md`, `TEST_PLAN.md`) создаются **после Phase 1**, перед 
