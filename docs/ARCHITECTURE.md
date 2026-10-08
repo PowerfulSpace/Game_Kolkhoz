@@ -154,24 +154,33 @@ class-ы. Никакой скрытой логики в моделях.
 
 ## 6. Модуль `data` — детали
 
-### 6.1. Структура (план)
+### 6.1. Структура
 data/
-└── src/main/kotlin/ru/kolkhoz/data/
-├── db/
-│ ├── KolkhozDatabase.kt
-│ ├── entity/
-│ │ ├── GameEntity.kt
-│ │ ├── PlayerEntity.kt
-│ │ └── GameEventEntity.kt
-│ └── dao/
-│ ├── GameDao.kt
-│ └── EventDao.kt
-├── mapper/
-│ ├── GameMapper.kt
-│ ├── PlayerMapper.kt
-│ └── EventMapper.kt
-└── repository/
-└── GameRepositoryImpl.kt
+└── src/
+    ├── main/kotlin/ru/kolkhoz/data/
+    │   ├── db/
+    │   │   ├── KolkhozDatabase.kt
+    │   │   ├── entity/
+    │   │   │   ├── GameEntity.kt
+    │   │   │   ├── PlayerEntity.kt
+    │   │   │   └── GameEventEntity.kt
+    │   │   └── dao/
+    │   │       ├── GameDao.kt
+    │   │       ├── PlayerDao.kt
+    │   │       └── EventDao.kt
+    │   ├── mapper/
+    │   │   ├── GameMapper.kt
+    │   │   ├── PlayerMapper.kt
+    │   │   └── EventMapper.kt
+    │   ├── repository/
+    │   │   └── LocalGameRepository.kt
+    │   └── di/
+    │       ├── DatabaseModule.kt
+    │       └── RepositoryModule.kt
+    └── test/kotlin/ru/kolkhoz/data/
+        ├── mapper/        (JUnit5)
+        ├── db/            (JUnit4 + Robolectric)
+        └── repository/    (JUnit4 + Robolectric)
 
 text
 
@@ -379,6 +388,10 @@ JUnit5.
 Room in-memory DB.
 
 Проверка DAO, мапперов, репозитория.
+
+Room-тесты используют Robolectric (JUnit4) + junit-vintage-engine, 
+чтобы работать в :data:test без эмулятора. Мапперы — JUnit5.
+Разделение зафиксировано в AGENTS.md §6.4.
 
 12.3. UI (instrumented-тесты)
 Compose UI tests.

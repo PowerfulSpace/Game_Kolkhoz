@@ -18,7 +18,7 @@ markdown
 |-------|----------|--------|--------|
 | 0 | Каркас проекта | все | ✅ Завершена |
 | 1 | Domain: модели, правила, тесты | `domain` | ✅ Завершена |
-| 2 | Data: Room, Repository | `data` | ⏳ Ожидает |
+| 2 | Data: Room, Repository | `data` | ✅ Завершена |
 | 3a | UI: тема + компоненты | `app` | ⏳ Ожидает |
 | 3b | UI: экраны | `app` | ⏳ Ожидает |
 | 4 | Связывание: ViewModel, навигация | `app` | ⏳ Ожидает |
@@ -193,16 +193,25 @@ markdown
 
 **Definition of Done:**
 
-- [ ] Room-база создана.
-- [ ] Все DAO работают.
-- [ ] Все мапперы покрыты тестами.
-- [ ] Repository реализован.
-- [ ] Тесты проходят.
-- [ ] Никакой бизнес-логики в `data`.
-- [ ] `./gradlew :data:test` — BUILD SUCCESSFUL.
-- [ ] `./gradlew assembleDebug` — BUILD SUCCESSFUL.
+- [x] Room-база создана.
+- [x] Все DAO работают.
+- [x] Все мапперы покрыты тестами.
+- [x] Repository реализован.
+- [x] Тесты проходят.
+- [x] Никакой бизнес-логики в `data`.
+- [x] `./gradlew :data:test` — BUILD SUCCESSFUL.
+- [x] `./gradlew assembleDebug` — BUILD SUCCESSFUL.
 
-**Результат:** ⏳ Ожидает.
+**Отклонения, зафиксированные:**
+
+- Robolectric 4.17 + junit-vintage-engine для Room-тестов (JUnit4), 
+  мапперы — JUnit5.
+- PlayerEntity: position + listOrder. ORDER BY listOrder.
+- GameEventEntity: @PrimaryKey без дублирования в primaryKeys.
+- --add-exports java.base/jdk.internal.access=ALL-UNNAMED для 
+  Robolectric на Java 21.
+
+**Результат:** ✅ Завершена. 35 тестов, все зелёные.
 
 ---
 
@@ -420,9 +429,9 @@ markdown
 
 ## Текущий статус
 
-**Сейчас:** Phase 1 (domain) — завершена (52 теста, все зелёные).
+**Сейчас:** Phase 2 (data) — завершена (35 тестов, все зелёные).
 
-**Следующее:** Phase 2 (data) — Room, Repository.
+**Следующее:** Phase 3a (UI: тема + компоненты).
 
 **P.S.** UI-документы (`DESIGN_SYSTEM.md`, `UI_SPEC.md`, 
 `SCREENS.md`, `TEST_PLAN.md`) создаются **после Phase 1**, перед 
