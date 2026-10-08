@@ -1,6 +1,7 @@
 package ru.kolkhoz.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,14 +11,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import ru.kolkhoz.ui.components.KolhozButton
 import ru.kolkhoz.ui.components.KolhozTopBar
 import ru.kolkhoz.ui.components.PlayerCountSelector
 import ru.kolkhoz.ui.components.PlayerInput
+import ru.kolkhoz.ui.model.NewGameUiState
 import ru.kolkhoz.ui.theme.KolhozColors
 import ru.kolkhoz.ui.theme.KolhozSpacing
 import ru.kolkhoz.ui.theme.KolkhozTheme
@@ -26,93 +33,106 @@ import ru.kolkhoz.ui.theme.KolhozTypography
 /**
  * Экран создания игры (UI_SPEC.md, раздел 3).
  *
- * Счётчик игроков 3–8, ввод имён, кнопка «НАЧАТЬ ИГРУ».
- * Inline-валидация в этом MVP-этапе не показывается
- * (`errorText = null`), валидация имён — в Phase 4.
- * Stateless: данные + callbacks, состояние не хранит.
+ * Счётчик игроков 3–8, ввод имён, кнопка «НАЧАТЬ ИГРУ»
+ * (disabled, пока имена невалидны — `uiState.canStartGame`).
+ * Stateless: принимает UI-state целиком и callbacks.
  *
- * @param playerCount Текущее количество игроков.
- * @param playerNames Имена игроков (по элементу на игрока).
- * @param onPlayerCountChange Колбэк смены количества.
+ * @param uiState Состояние экрана создания игры.
+ * @param onPlayerCountChange Колбэк смены количества игроков.
  * @param onPlayerNameChange Колбэк смены имени (индекс, текст).
  * @param onDeletePlayer Колбэк удаления игрока (индекс).
  * @param onBack Колбэк «назад».
  * @param onStartGame Колбэк «НАЧАТЬ ИГРУ».
- * @param canStartGame Можно ли начать игру (все имена валидны).
+ * @param onErrorShown Колбэк «ошибка показана» (сброс errorMessage).
  * @param modifier Модификатор.
  */
 @Composable
 fun NewGameScreen(
-    playerCount: Int,
-    playerNames: List<String>,
+    uiState: NewGameUiState,
     onPlayerCountChange: (Int) -> Unit,
     onPlayerNameChange: (Int, String) -> Unit,
     onDeletePlayer: (Int) -> Unit,
     onBack: () -> Unit,
     onStartGame: () -> Unit,
-    canStartGame: Boolean,
+    onErrorShown: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(KolhozSpacing.L),
-        verticalArrangement = Arrangement.spacedBy(KolhozSpacing.L),
-    ) {
-        KolhozTopBar(title = "НОВАЯ ИГРА", onBackClick = onBack)
+    val snackbarHostState = remember { SnackbarHostState() }
 
-        Text(
-            text = "СКОЛЬКО ИГРОКОВ?",
-            style = KolhozTypography.H2,
-            color = KolhozColors.TextPrimary,
-        )
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            onErrorShown()
+        }
+    }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(KolhozSpacing.L),
+            verticalArrangement = Arrangement.spacedBy(KolhozSpacing.L),
         ) {
-            PlayerCountSelector(
-                value = playerCount,
-                onDecrease = { onPlayerCountChange(playerCount - 1) },
-                onIncrease = { onPlayerCountChange(playerCount + 1) },
-                min = 3,
-                max = 8,
+            KolhozTopBar(title = "НОВАЯ ИГРА", onBackClick = onBack)
+
+            Text(
+                text = "СКОЛЬКО ИГРОКОВ?",
+                style = KolhozTypography.H2,
+                color = KolhozColors.TextPrimary,
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                PlayerCountSelector(
+                    value = uiState.playerCount,
+                    onDecrease = { onPlayerCountChange(uiState.playerCount - 1) },
+                    onIncrease = { onPlayerCountChange(uiState.playerCount + 1) },
+                    min = 3,
+                    max = 8,
+                )
+            }
+
+            Text(
+                text = "ОТ 3 ДО 8 ИГРОКОВ",
+                style = KolhozTypography.Caption,
+                color = KolhozColors.TextSecondary,
+            )
+
+            Text(
+                text = "ИГРОКИ",
+                style = KolhozTypography.H2,
+                color = KolhozColors.TextPrimary,
+            )
+
+            Column(verticalArrangement = Arrangement.spacedBy(KolhozSpacing.M)) {
+                for (i in 0 until uiState.playerCount) {
+                    PlayerInput(
+                        value = uiState.playerNames[i],
+                        onValueChange = { onPlayerNameChange(i, it) },
+                        playerNumber = i + 1,
+                        onDelete = { onDeletePlayer(i) },
+                        maxLength = 32,
+                        errorText = null,
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(KolhozSpacing.XXL))
+
+            KolhozButton(
+                text = "НАЧАТЬ ИГРУ",
+                onClick = onStartGame,
+                enabled = uiState.canStartGame,
+                modifier = Modifier.fillMaxWidth(),
             )
         }
 
-        Text(
-            text = "ОТ 3 ДО 8 ИГРОКОВ",
-            style = KolhozTypography.Caption,
-            color = KolhozColors.TextSecondary,
-        )
-
-        Text(
-            text = "ИГРОКИ",
-            style = KolhozTypography.H2,
-            color = KolhozColors.TextPrimary,
-        )
-
-        Column(verticalArrangement = Arrangement.spacedBy(KolhozSpacing.M)) {
-            for (i in 0 until playerCount) {
-                PlayerInput(
-                    value = playerNames[i],
-                    onValueChange = { onPlayerNameChange(i, it) },
-                    playerNumber = i + 1,
-                    onDelete = { onDeletePlayer(i) },
-                    maxLength = 32,
-                    errorText = null,
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(KolhozSpacing.XXL))
-
-        KolhozButton(
-            text = "НАЧАТЬ ИГРУ",
-            onClick = onStartGame,
-            enabled = canStartGame,
-            modifier = Modifier.fillMaxWidth(),
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
         )
     }
 }
@@ -122,14 +142,17 @@ fun NewGameScreen(
 private fun NewGameScreenPreview() {
     KolkhozTheme {
         NewGameScreen(
-            playerCount = 4,
-            playerNames = listOf("Саша", "Петя", "Коля", "Дима"),
+            uiState = NewGameUiState(
+                playerCount = 4,
+                playerNames = listOf("Саша", "Петя", "Коля", "Дима"),
+                canStartGame = true,
+            ),
             onPlayerCountChange = {},
             onPlayerNameChange = { _, _ -> },
             onDeletePlayer = {},
             onBack = {},
             onStartGame = {},
-            canStartGame = true,
+            onErrorShown = {},
         )
     }
 }

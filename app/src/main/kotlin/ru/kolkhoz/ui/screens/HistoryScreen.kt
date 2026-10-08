@@ -4,12 +4,12 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,28 +19,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import ru.kolkhoz.ui.components.KolhozTopBar
 import ru.kolkhoz.ui.components.ShotHistoryRow
+import ru.kolkhoz.ui.model.HistoryUiState
+import ru.kolkhoz.ui.model.ShotUi
 import ru.kolkhoz.ui.theme.KolhozColors
 import ru.kolkhoz.ui.theme.KolhozSpacing
 import ru.kolkhoz.ui.theme.KolkhozTheme
 import ru.kolkhoz.ui.theme.KolhozTypography
-
-/**
- * Временная модель удара для истории (Phase 3b).
- *
- * Только для отображения. В Phase 4 будет заменена
- * на реальную модель из ViewModel.
- *
- * @param sequenceNumber Порядковый номер удара в партии.
- * @param playerName Имя игрока.
- * @param isPocket Забил ли шар.
- * @param time Уже отформатированное время, например `21:34`.
- */
-data class ShotUi(
-    val sequenceNumber: Int,
-    val playerName: String,
-    val isPocket: Boolean,
-    val time: String,
-)
 
 /**
  * Экран истории партии (UI_SPEC.md, раздел 5).
@@ -48,27 +32,25 @@ data class ShotUi(
  * Портрет: список `ShotHistoryRow`, свежие сверху.
  * Ландшафт (5.6): таблица с заголовком колонок.
  * Пустое состояние: «Пока нет ударов».
- * Stateless: данные + callbacks, состояние не хранит.
+ * Stateless: принимает UI-state целиком и callback.
  *
- * @param events Список ударов (в любом порядке).
+ * @param uiState Состояние истории (уже отсортировано свежими вперёд).
  * @param onBack Колбэк «назад».
  * @param modifier Модификатор.
  */
 @Composable
 fun HistoryScreen(
-    events: List<ShotUi>,
+    uiState: HistoryUiState,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val isLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-    // Свежие сверху.
-    val sorted = events.sortedByDescending { it.sequenceNumber }
 
     Column(modifier = modifier.fillMaxSize()) {
         KolhozTopBar(title = "ИСТОРИЯ ИГРЫ", onBackClick = onBack)
 
-        if (events.isEmpty()) {
+        if (uiState.isEmpty) {
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -105,7 +87,7 @@ fun HistoryScreen(
                         .weight(1f)
                         .fillMaxWidth(),
                 ) {
-                    items(sorted, key = { it.sequenceNumber }) { event ->
+                    items(uiState.events, key = { it.sequenceNumber }) { event ->
                         HistoryTableRow(event)
                     }
                 }
@@ -116,7 +98,7 @@ fun HistoryScreen(
                     .weight(1f)
                     .fillMaxWidth(),
             ) {
-                items(sorted, key = { it.sequenceNumber }) { event ->
+                items(uiState.events, key = { it.sequenceNumber }) { event ->
                     ShotHistoryRow(
                         index = event.sequenceNumber,
                         playerName = event.playerName,
@@ -139,6 +121,7 @@ private fun RowScope.HistoryTableHeaderCell(text: String, weight: Float) {
     )
 }
 
+/** Строка таблицы истории в landscape (UI_SPEC.md, 5.6). */
 @Composable
 private fun HistoryTableRow(event: ShotUi) {
     Row(
@@ -173,19 +156,22 @@ private fun HistoryTableRow(event: ShotUi) {
     }
 }
 
-private fun mockEvents(): List<ShotUi> = listOf(
-    ShotUi(28, "Коля", true, "21:34"),
-    ShotUi(27, "Коля", true, "21:32"),
-    ShotUi(26, "Коля", true, "21:31"),
-    ShotUi(25, "Петя", false, "21:28"),
-    ShotUi(24, "Петя", true, "21:24"),
+private fun previewState(): HistoryUiState = HistoryUiState(
+    events = listOf(
+        ShotUi(28, "Коля", true, "21:34"),
+        ShotUi(27, "Коля", true, "21:32"),
+        ShotUi(26, "Коля", true, "21:31"),
+        ShotUi(25, "Петя", false, "21:28"),
+        ShotUi(24, "Петя", true, "21:24"),
+    ),
+    isEmpty = false,
 )
 
 @Preview(showBackground = true, backgroundColor = 0xFF08110F)
 @Composable
 private fun HistoryScreenPortraitPreview() {
     KolkhozTheme {
-        HistoryScreen(events = mockEvents(), onBack = {})
+        HistoryScreen(uiState = previewState(), onBack = {})
     }
 }
 
@@ -198,6 +184,6 @@ private fun HistoryScreenPortraitPreview() {
 @Composable
 private fun HistoryScreenLandscapePreview() {
     KolkhozTheme {
-        HistoryScreen(events = mockEvents(), onBack = {})
+        HistoryScreen(uiState = previewState(), onBack = {})
     }
 }

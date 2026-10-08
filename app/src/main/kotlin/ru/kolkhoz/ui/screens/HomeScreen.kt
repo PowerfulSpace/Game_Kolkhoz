@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -19,6 +23,7 @@ import ru.kolkhoz.R
 import ru.kolkhoz.ui.components.KolhozButton
 import ru.kolkhoz.ui.components.KolhozSecondaryButton
 import ru.kolkhoz.ui.components.KolhozTextButton
+import ru.kolkhoz.ui.model.HomeUiState
 import ru.kolkhoz.ui.theme.KolhozColors
 import ru.kolkhoz.ui.theme.KolhozSpacing
 import ru.kolkhoz.ui.theme.KolkhozTheme
@@ -29,23 +34,36 @@ import ru.kolkhoz.ui.theme.KolhozTypography
  *
  * Точка входа: новая игра, продолжить, история.
  * Кнопка «ПРОДОЛЖИТЬ ИГРУ» показывается только при
- * `hasActiveGame = true` (скрыта, не disabled).
- * Stateless: данные + callbacks, состояние не хранит.
+ * `uiState.hasActiveGame` (скрыта, не disabled).
+ * Stateless: принимает UI-state целиком и callbacks.
  *
+ * @param uiState Состояние главного экрана.
  * @param onNewGame Колбэк «НОВАЯ ИГРА».
  * @param onContinueGame Колбэк «ПРОДОЛЖИТЬ ИГРУ».
  * @param onHistory Колбэк «ИСТОРИЯ ИГР».
- * @param hasActiveGame Есть ли активная партия.
+ * @param onErrorShown Колбэк «ошибка показана» (сброс errorMessage).
  * @param modifier Модификатор.
  */
 @Composable
 fun HomeScreen(
+    uiState: HomeUiState,
     onNewGame: () -> Unit,
     onContinueGame: () -> Unit,
     onHistory: () -> Unit,
-    hasActiveGame: Boolean,
+    onErrorShown: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            onErrorShown()
+        }
+    }
+
+    // Во время загрузки (isLoading) показываем экран как есть:
+    // до первого emission активной партии нет — кнопка скрыта.
     Box(modifier = modifier.fillMaxSize()) {
         // Фон: фото стола в нижних 40% экрана, приглушённое.
         Image(
@@ -100,7 +118,7 @@ fun HomeScreen(
                     onClick = onNewGame,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                if (hasActiveGame) {
+                if (uiState.hasActiveGame) {
                     KolhozSecondaryButton(
                         text = "ПРОДОЛЖИТЬ ИГРУ",
                         onClick = onContinueGame,
@@ -114,6 +132,11 @@ fun HomeScreen(
                 )
             }
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
     }
 }
 
@@ -122,10 +145,11 @@ fun HomeScreen(
 private fun HomeScreenPreview() {
     KolkhozTheme {
         HomeScreen(
+            uiState = HomeUiState(hasActiveGame = true),
             onNewGame = {},
             onContinueGame = {},
             onHistory = {},
-            hasActiveGame = true,
+            onErrorShown = {},
         )
     }
 }

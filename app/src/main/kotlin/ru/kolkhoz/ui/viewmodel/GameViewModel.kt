@@ -11,11 +11,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.kolkhoz.domain.model.Game
 import ru.kolkhoz.domain.model.GameEvent
+import ru.kolkhoz.domain.model.GameId
 import ru.kolkhoz.domain.model.ShotResult
 import ru.kolkhoz.domain.repository.GameRepository
 import ru.kolkhoz.domain.rules.GameRules
 import ru.kolkhoz.ui.mapper.toGameUiState
+import ru.kolkhoz.ui.mapper.toHistoryUiState
 import ru.kolkhoz.ui.model.GameUiState
+import ru.kolkhoz.ui.model.HistoryUiState
 
 private const val SAVE_ERROR_MESSAGE = "Не удалось сохранить партию"
 
@@ -40,6 +43,26 @@ class GameViewModel @Inject constructor(
     /** Состояние игрового экрана; `null` — активной партии нет. */
     val uiState: StateFlow<GameUiState?> = _uiState.asStateFlow()
 
+    /** Пока идёт первая загрузка из репозитория (борьба с мельканием null-состояния). */
+    private val _isLoading = MutableStateFlow(true)
+
+    /** `true` — партия ещё не загружена; `false` — данные получены. */
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    /** id активной партии; `null` — партии нет. */
+    private val _currentGameId = MutableStateFlow<GameId?>(null)
+
+    /** id активной партии для навигации (например, на итоги). */
+    val currentGameId: StateFlow<GameId?> = _currentGameId.asStateFlow()
+
+    /** История ударов активной партии — для экрана истории. */
+    private val _historyUiState = MutableStateFlow(
+        HistoryUiState(events = emptyList(), isEmpty = true),
+    )
+
+    /** История ударов активной партии (производна от текущей партии). */
+    val historyUiState: StateFlow<HistoryUiState> = _historyUiState.asStateFlow()
+
     /** Последняя загруженная партия (для синхронных вызовов GameRules). */
     private var currentGame: Game? = null
 
@@ -49,7 +72,11 @@ class GameViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             repository.observeActiveGame().collect { game ->
+                _isLoading.value = false
                 currentGame = game
+                _currentGameId.value = game?.id
+                _historyUiState.value = game?.toHistoryUiState()
+                    ?: HistoryUiState(events = emptyList(), isEmpty = true)
                 _uiState.value = if (game != null) {
                     GameRules.recompute(game).toGameUiState(
                         lastUndoneEvent = lastUndoneEvent,
@@ -91,10 +118,18 @@ class GameViewModel @Inject constructor(
         )
     }
 
-    /** Завершает партию (статус FINISHED, идемпотентно). */
-    fun onFinishGame() {
+    /**
+     * Завершает партию (статус FINISHED, идемпотентно) и сразу
+     * отдаёт её id вызывающему — для перехода на экран итогов
+     * (`Routes.result(gameId)`), пока Flow ещё не обновился.
+     *
+     * @param onFinished Вызывается с id партии после запуска
+     *   сохранения завершённой партии.
+     */
+    fun onFinishGame(onFinished: (GameId) -> Unit) {
         val game = currentGame ?: return
         save(GameRules.finishGame(game))
+        onFinished(game.id)
     }
 
     /** Сбрасывает сообщение об ошибке. */
