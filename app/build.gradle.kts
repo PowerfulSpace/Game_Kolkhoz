@@ -53,8 +53,12 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    // viewModelScope для @HiltViewModel (Phase 4a).
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
+    // hiltViewModel() для подключения экранов к ViewModel (Phase 4b).
+    implementation(libs.androidx.hilt.navigation.compose)
 
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
