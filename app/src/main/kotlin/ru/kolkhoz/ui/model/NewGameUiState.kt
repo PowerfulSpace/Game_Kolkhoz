@@ -9,6 +9,9 @@ package ru.kolkhoz.ui.model
  * @property canStartGame Можно ли начать игру: все имена
  *   валидны (не пустые, уникальные без учёта регистра,
  *   1–32 символа) — UI_SPEC.md 3.4.
+ * @property nameErrors Inline-ошибки имён: по элементу на
+ *   игрока; `null` — ошибки нет, иначе текст подсказки
+ *   (UI_SPEC.md 3.5).
  * @property errorMessage Человеческое сообщение об ошибке
  *   создания; `null` — ошибки нет.
  */
@@ -16,5 +19,6 @@ data class NewGameUiState(
     val playerCount: Int = 4,
     val playerNames: List<String> = List(4) { "" },
     val canStartGame: Boolean = false,
+    val nameErrors: List<String?> = List(4) { null },
     val errorMessage: String? = null,
 )

@@ -1,36 +1,32 @@
-# Game_Kolkhoz — «Колхоз»
+# Колхоз
 
 Android-приложение для подсчёта очков в бильярде.
 
-## Описание
+## Что это
 
-Многомодульный Android-проект на Kotlin и Jetpack Compose. На текущем шаге
-подготовлен только каркас проекта: модули, сборочные скрипты, DI (Hilt) и
-хранилище (Room) подключены, бизнес-логики и экранов пока нет — приложение
-показывает пустой экран с названием «Колхоз».
+«Колхоз» — счётчик очков для игры в бильярд: 3–8 игроков,
+забитые шары и промахи, серии, отмена удара и история партии.
+Минимум интерфейса — приложение нажимается между ударами,
+не требует чтения инструкций.
+
+## Скриншоты
+
+Скриншоты будут добавлены после первой сборки.
 
 ## Стек
 
-- Kotlin 2.4.21 (JVM target 17)
-- Jetpack Compose (BOM 2026.09.00), Material 3
-- Hilt (DI) — модули `app` и `data`
-- Room + KSP — модуль `data`
-- Kotlin Coroutines + Flow
-- JUnit 5 (JUnit Platform) — тесты модуля `domain`
-- AndroidX: core-ktx, lifecycle, activity-compose, navigation-compose
-- Gradle 9.8.1 + Version Catalog (`gradle/libs.versions.toml`)
-- Android Gradle Plugin 9.4.1, minSdk 26, compileSdk/targetSdk 37, Java 17
+- Kotlin
+- Jetpack Compose
+- Hilt
+- Room
+- Coroutines
 
-## Структура модулей
+## Структура
 
-```
-Game_Kolkhoz/
-├── app/      — Android-приложение: UI (Compose), навигация, DI-обвязка
-├── domain/   — чистый Kotlin/JVM-модуль, без Android-зависимостей
-├── data/     — Android-библиотека: Room, репозитории
-├── docs/     — документация
-└── gradle/   — Version Catalog (libs.versions.toml) и Gradle Wrapper
-```
+- `app/` — UI, навигация, ViewModel
+- `domain/` — бизнес-логика (правила игры)
+- `data/` — Room, репозитории
+- `docs/` — документация
 
 ## Сборка
 
@@ -38,8 +34,16 @@ Game_Kolkhoz/
 ./gradlew assembleDebug
 ```
 
-Тесты:
+(требуется Android SDK)
 
-```bash
-./gradlew test
-```
+## Документация
+
+- docs/SPEC.md — спецификация продукта
+- docs/DOMAIN_MODEL.md — правила игры
+- docs/ARCHITECTURE.md — архитектура
+- docs/DESIGN_SYSTEM.md — дизайн-система
+- docs/UI_SPEC.md — экраны
+
+## Лицензия
+
+См. LICENSE.

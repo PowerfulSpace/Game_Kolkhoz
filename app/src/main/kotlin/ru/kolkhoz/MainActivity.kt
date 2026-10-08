@@ -12,11 +12,16 @@ import ru.kolkhoz.ui.theme.KolkhozTheme
  *
  * Hilt-точка входа ([AndroidEntryPoint]); в setContent —
  * корневая тема и граф навигации ([KolkhozNavHost]).
+ *
+ * Splash-тема (`Theme.Kolkhoz.Splash`, тёмный windowBackground)
+ * включается в манифесте и снимается здесь же до
+ * [super.onCreate] — вариант A без библиотек.
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.Theme_Kolkhoz)
         super.onCreate(savedInstanceState)
         setContent {
             KolkhozTheme {

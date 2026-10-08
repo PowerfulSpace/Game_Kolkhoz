@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Фон иконки приложения (DESIGN_SYSTEM.md 2.1). -->
+    <color name="ic_launcher_background">#08110F</color>
+    <!-- Фон splash-экрана — тот же тёмный (UI_SPEC.md 1). -->
+    <color name="splash_background">#08110F</color>
+</resources>

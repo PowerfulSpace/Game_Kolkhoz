@@ -22,6 +22,10 @@ private const val MIN_PLAYERS = 3
 private const val MAX_PLAYERS = 8
 private const val MAX_NAME_LENGTH = 32
 
+private const val EMPTY_NAME_ERROR = "Введите имя игрока"
+private const val DUPLICATE_NAME_ERROR = "Такое имя уже есть"
+private const val LONG_NAME_ERROR = "Имя слишком длинное"
+
 /**
  * ViewModel экрана создания игры (UI_SPEC.md, раздел 3).
  *
@@ -125,14 +129,31 @@ class NewGameViewModel @Inject constructor(
         _uiState.update { it.copy(errorMessage = null) }
     }
 
-    /** Пересчитывает canStartGame по текущим именам. */
-    private fun NewGameUiState.recalculated(): NewGameUiState =
-        copy(canStartGame = playerNames.allValidUnique())
+    /**
+     * Пересчитывает [NewGameUiState.nameErrors] для всех
+     * игроков и [NewGameUiState.canStartGame] (UI_SPEC.md 3.5).
+     */
+    private fun NewGameUiState.recalculated(): NewGameUiState {
+        val errors = validateNames(playerNames)
+        return copy(
+            nameErrors = errors,
+            canStartGame = errors.all { it == null },
+        )
+    }
 
-    /** Имена валидны по UI_SPEC.md 3.4: не пустые, уникальные без учёта регистра и пробелов. */
-    private fun List<String>.allValidUnique(): Boolean {
-        if (any { it.isBlank() || it.length > MAX_NAME_LENGTH }) return false
-        val keys = map { it.trim().lowercase() }
-        return keys.toSet().size == keys.size
+    /**
+     * Inline-ошибки всех полей; дубликат — ошибка у обоих
+     * игроков с одинаковым именем (сравнение trim + lowercase).
+     */
+    private fun validateNames(names: List<String>): List<String?> {
+        val keys = names.map { it.trim().lowercase() }
+        return names.mapIndexed { index, name ->
+            when {
+                name.isBlank() -> EMPTY_NAME_ERROR
+                name.length > MAX_NAME_LENGTH -> LONG_NAME_ERROR
+                keys.count { it == keys[index] } > 1 -> DUPLICATE_NAME_ERROR
+                else -> null
+            }
+        }
     }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Foreground адаптивной иконки: зелёный шар с белой буквой «К».
+    Простой vector drawable — сложный logo_kolkhoz.png для
+    иконки не используется (DESIGN_SYSTEM.md 10.4).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Шар: круг радиуса 24 в центре safe zone. -->
+    <path
+        android:fillColor="#18C77A"
+        android:pathData="M54,30 a24,24 0 1,0 0.01,0 z" />
+
+    <!-- Буква «К». -->
+    <path
+        android:pathData="M45,40 L45,68 M45,54 L63,40 M45,54 L63,68"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="round" />
+</vector>

@@ -115,7 +115,7 @@ fun NewGameScreen(
                         playerNumber = i + 1,
                         onDelete = { onDeletePlayer(i) },
                         maxLength = 32,
-                        errorText = null,
+                        errorText = uiState.nameErrors.getOrNull(i),
                     )
                 }
             }
@@ -144,8 +144,9 @@ private fun NewGameScreenPreview() {
         NewGameScreen(
             uiState = NewGameUiState(
                 playerCount = 4,
-                playerNames = listOf("Саша", "Петя", "Коля", "Дима"),
-                canStartGame = true,
+                playerNames = listOf("Саша", "Петя", "", "Дима"),
+                canStartGame = false,
+                nameErrors = listOf(null, null, "Введите имя игрока", null),
             ),
             onPlayerCountChange = {},
             onPlayerNameChange = { _, _ -> },

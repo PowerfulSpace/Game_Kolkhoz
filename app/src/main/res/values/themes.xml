@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.Kolkhoz" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Splash: тёмный windowBackground, чтобы не мелькал белый кадр
+         до первой композиции (вариант A — без библиотек). -->
+    <style name="Theme.Kolkhoz.Splash" parent="Theme.Kolkhoz">
+        <item name="android:windowBackground">@color/splash_background</item>
+    </style>
 </resources>
