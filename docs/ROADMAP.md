@@ -380,6 +380,14 @@ markdown
    - Никаких хардкод-строк в Compose.
    - Локализация на другие языки — v2+.
 
+10. **Оптимизация ассетов:**
+    - Сжать `home_background.png` (→ 1080×720, TinyPNG).
+    - Сжать `trophy.png` (→ 512×512, TinyPNG).
+    - Сжать `logo_kolkhoz.png` (→ 1024×512, TinyPNG).
+    - Целевой итог: ~700 КБ вместо ~4.5 МБ.
+    - Проверить, что прозрачность сохранилась.
+    - Детали — в `DESIGN_SYSTEM.md`, раздел 19.1.
+
 **Definition of Done:**
 
 - [ ] `./gradlew assembleRelease` — BUILD SUCCESSFUL.
