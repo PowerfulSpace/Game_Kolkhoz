@@ -209,18 +209,19 @@ fun KolkhozNavHost(
  * composable (UI_SPEC.md 1.2: Home, NewGame, Result — только
  * portrait; Game и History работают в обеих ориентациях).
  *
- * При выходе из composable исходная ориентация восстанавливается.
+ * При выходе ориентация снимается в UNSPECIFIED — сенсор
+ * сам решает (в т.ч. в landscape). Восстанавливать «что было»
+ * нельзя: MainActivity стартует с PORTRAIT, и возврат к нему
+ * навсегда запер бы Game/History в portrait.
  */
 @Composable
 private fun LockPortrait() {
     val context = LocalContext.current
     DisposableEffect(Unit) {
         val activity = context.findActivity()
-        val original = activity?.requestedOrientation
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         onDispose {
-            activity?.requestedOrientation =
-                original ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         }
     }
 }

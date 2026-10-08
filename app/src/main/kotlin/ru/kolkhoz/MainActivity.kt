@@ -1,5 +1,6 @@
 package ru.kolkhoz
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,6 +14,11 @@ import ru.kolkhoz.ui.theme.KolkhozTheme
  * Hilt-точка входа ([AndroidEntryPoint]); в setContent —
  * корневая тема и граф навигации ([KolkhozNavHost]).
  *
+ * Ориентация фиксируется в portrait до setContent, чтобы
+ * запуск в landscape сразу стартовал в portrait (UI_SPEC.md 1.2);
+ * далее [KolkhozNavHost] держит portrait на статических
+ * экранах и отпускает на Game/History.
+ *
  * Splash-тема (`Theme.Kolkhoz.Splash`, тёмный windowBackground)
  * включается в манифесте и снимается здесь же до
  * [super.onCreate] — вариант A без библиотек.
@@ -23,6 +29,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.Theme_Kolkhoz)
         super.onCreate(savedInstanceState)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         setContent {
             KolkhozTheme {
                 KolkhozNavHost()

@@ -7,13 +7,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -49,6 +52,9 @@ import ru.kolkhoz.ui.theme.KolhozTypography
  * (фон Primary 20%, рамка Primary, корона) и кнопки.
  * Stateless: принимает UI-state целиком и callbacks.
  *
+ * Состояния (UI_SPEC.md 1.3): Loading — спиннер; пустая
+ * «Партия не найдена» с кнопкой «НА ГЛАВНУЮ»; иначе Content.
+ *
  * @param uiState Состояние экрана итогов (игроки по местам).
  * @param onNewGame Колбэк «НОВАЯ ИГРА».
  * @param onHome Колбэк «НА ГЛАВНУЮ».
@@ -70,6 +76,40 @@ fun ResultScreen(
             snackbarHostState.showSnackbar(it)
             onErrorShown()
         }
+    }
+
+    // Загрузка партии (UI_SPEC.md 1.3 — состояние Loading).
+    if (uiState.isLoading) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator(color = KolhozColors.Primary)
+        }
+        return
+    }
+
+    // Партия не найдена — без пустого «ИГРА ОКОНЧЕНА».
+    if (uiState.players.isEmpty()) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(KolhozSpacing.L),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text(
+                text = "Партия не найдена",
+                style = KolhozTypography.H2,
+                color = KolhozColors.TextPrimary,
+            )
+            Spacer(modifier = Modifier.height(KolhozSpacing.XXL))
+            KolhozSecondaryButton(
+                text = "НА ГЛАВНУЮ",
+                onClick = onHome,
+            )
+        }
+        return
     }
 
     Box(modifier = modifier.fillMaxSize()) {

@@ -126,17 +126,38 @@ class GameViewModel @Inject constructor(
     }
 
     /**
-     * Завершает партию (статус FINISHED, идемпотентно) и сразу
-     * отдаёт её id вызывающему — для перехода на экран итогов
-     * (`Routes.result(gameId)`), пока Flow ещё не обновился.
+     * Завершает партию (статус FINISHED, идемпотентно) и отдаёт её
+     * id вызывающему **только после успешного сохранения** —
+     * навигация (`popUpTo(GAME inclusive)`) уничтожает ViewModel,
+     * и прерванная запись оставила бы партию активной.
      *
-     * @param onFinished Вызывается с id партии после запуска
+     * При ошибке записи — сообщение в errorMessage, без навигации:
+     * пользователь остаётся на экране.
+     *
+     * @param onFinished Вызывается с id партии после успешного
      *   сохранения завершённой партии.
      */
     fun onFinishGame(onFinished: (GameId) -> Unit) {
         val game = currentGame ?: return
-        save(GameRules.finishGame(game))
-        onFinished(game.id)
+        // Блокируем кнопки удара, пока идёт запись завершения:
+        // удар в этот промежуток перезаписал бы ACTIVE поверх FINISHED.
+        isSaving = true
+        _uiState.update { it?.copy(isSaving = true) }
+        viewModelScope.launch {
+            try {
+                repository.saveGame(GameRules.finishGame(game))
+            } catch (e: Exception) {
+                isSaving = false
+                _uiState.update {
+                    it?.copy(
+                        errorMessage = SAVE_ERROR_MESSAGE,
+                        isSaving = false,
+                    )
+                }
+                return@launch
+            }
+            onFinished(game.id)
+        }
     }
 
     /** Сбрасывает сообщение об ошибке. */
