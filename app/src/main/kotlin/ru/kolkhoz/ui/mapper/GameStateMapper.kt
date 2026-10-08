@@ -22,10 +22,12 @@ import ru.kolkhoz.ui.model.ShotUi
  *
  * @param lastUndoneEvent Последнее отменённое событие — для redo.
  * @param canUndo Можно ли отменить последний удар.
+ * @param isSaving Идёт ли сохранение партии (блокировка кнопок).
  */
 fun GameState.toGameUiState(
     lastUndoneEvent: GameEvent?,
     canUndo: Boolean,
+    isSaving: Boolean = false,
 ): GameUiState = GameUiState(
     players = players.map { player ->
         PlayerUi(
@@ -40,6 +42,7 @@ fun GameState.toGameUiState(
     canUndo = canUndo,
     status = status,
     lastUndoneEvent = lastUndoneEvent,
+    isSaving = isSaving,
 )
 
 /**

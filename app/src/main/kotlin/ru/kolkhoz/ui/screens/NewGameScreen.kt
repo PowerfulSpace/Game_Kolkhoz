@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import ru.kolkhoz.ui.components.KolhozButton
+import ru.kolkhoz.ui.components.KolhozDialog
 import ru.kolkhoz.ui.components.KolhozTopBar
 import ru.kolkhoz.ui.components.PlayerCountSelector
 import ru.kolkhoz.ui.components.PlayerInput
@@ -37,12 +38,19 @@ import ru.kolkhoz.ui.theme.KolhozTypography
  * (disabled, пока имена невалидны — `uiState.canStartGame`).
  * Stateless: принимает UI-state целиком и callbacks.
  *
+ * Диалог «У ВАС ЕСТЬ АКТИВНАЯ ПАРТИЯ» (UI_SPEC.md 3.4, 8.2)
+ * управляется состоянием [showActiveGameDialog] извне —
+ * владелец (NavHost) решает, показывать ли его.
+ *
  * @param uiState Состояние экрана создания игры.
  * @param onPlayerCountChange Колбэк смены количества игроков.
  * @param onPlayerNameChange Колбэк смены имени (индекс, текст).
  * @param onDeletePlayer Колбэк удаления игрока (индекс).
  * @param onBack Колбэк «назад».
- * @param onStartGame Колбэк «НАЧАТЬ ИГРУ».
+ * @param onStartGame Колбэк «НАЧАТЬ ИГРУ» (проверка активной партии — у владельца).
+ * @param showActiveGameDialog Показывать ли диалог активной партии.
+ * @param onConfirmFinishActive Подтверждение: завершить активную и создать новую.
+ * @param onCancelFinishActive Отмена диалога активной партии.
  * @param onErrorShown Колбэк «ошибка показана» (сброс errorMessage).
  * @param modifier Модификатор.
  */
@@ -54,6 +62,9 @@ fun NewGameScreen(
     onDeletePlayer: (Int) -> Unit,
     onBack: () -> Unit,
     onStartGame: () -> Unit,
+    showActiveGameDialog: Boolean,
+    onConfirmFinishActive: () -> Unit,
+    onCancelFinishActive: () -> Unit,
     onErrorShown: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -125,8 +136,19 @@ fun NewGameScreen(
             KolhozButton(
                 text = "НАЧАТЬ ИГРУ",
                 onClick = onStartGame,
-                enabled = uiState.canStartGame,
+                enabled = uiState.canStartGame && !uiState.isSaving,
                 modifier = Modifier.fillMaxWidth(),
+            )
+        }
+
+        if (showActiveGameDialog) {
+            KolhozDialog(
+                title = "У ВАС ЕСТЬ АКТИВНАЯ ПАРТИЯ",
+                text = "Завершить её и создать новую?",
+                confirmText = "ЗАВЕРШИТЬ",
+                onConfirm = onConfirmFinishActive,
+                cancelText = "ОТМЕНА",
+                onDismiss = onCancelFinishActive,
             )
         }
 
@@ -153,6 +175,9 @@ private fun NewGameScreenPreview() {
             onDeletePlayer = {},
             onBack = {},
             onStartGame = {},
+            showActiveGameDialog = false,
+            onConfirmFinishActive = {},
+            onCancelFinishActive = {},
             onErrorShown = {},
         )
     }

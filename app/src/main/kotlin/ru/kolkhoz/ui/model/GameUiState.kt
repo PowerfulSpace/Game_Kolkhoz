@@ -23,6 +23,8 @@ import ru.kolkhoz.domain.model.PlayerId
  * @property status Статус партии.
  * @property lastUndoneEvent Последнее отменённое событие —
  *   для повтора (redo); `null` — redo недоступен.
+ * @property isSaving Идёт ли сохранение партии; пока `true` —
+ *   кнопки удара заблокированы (защита от дабл-тапа).
  * @property errorMessage Человеческое сообщение об ошибке;
  *   `null` — ошибки нет.
  */
@@ -33,5 +35,6 @@ data class GameUiState(
     val canUndo: Boolean,
     val status: GameStatus,
     val lastUndoneEvent: GameEvent?,
+    val isSaving: Boolean = false,
     val errorMessage: String? = null,
 )

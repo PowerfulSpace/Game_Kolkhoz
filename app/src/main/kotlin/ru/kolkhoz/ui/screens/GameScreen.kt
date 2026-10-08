@@ -37,6 +37,7 @@ import ru.kolkhoz.domain.model.PlayerId
 import ru.kolkhoz.ui.components.CurrentPlayerCard
 import ru.kolkhoz.ui.components.KolhozBottomBar
 import ru.kolkhoz.ui.components.KolhozButton
+import ru.kolkhoz.ui.components.KolhozDialog
 import ru.kolkhoz.ui.components.KolhozSecondaryButton
 import ru.kolkhoz.ui.components.KolhozTopBar
 import ru.kolkhoz.ui.components.PlayerRow
@@ -174,6 +175,9 @@ private fun GameContent(
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val current = uiState.players.firstOrNull { it.id == uiState.currentPlayerId }
     var menuExpanded by remember { mutableStateOf(false) }
+    var showFinishDialog by remember { mutableStateOf(false) }
+    // Пока идёт сохранение — кнопки удара заблокированы (дабл-тап).
+    val buttonsEnabled = !uiState.isSaving
 
     Column(modifier = Modifier.fillMaxSize()) {
         Box {
@@ -197,10 +201,25 @@ private fun GameContent(
                     text = { Text("Завершить игру") },
                     onClick = {
                         menuExpanded = false
-                        onFinish()
+                        // UI_SPEC.md 4.4, 8.1: сначала диалог подтверждения.
+                        showFinishDialog = true
                     },
                 )
             }
+        }
+
+        if (showFinishDialog) {
+            KolhozDialog(
+                title = "ЗАВЕРШИТЬ ИГРУ?",
+                text = "Текущая партия будет сохранена в истории.",
+                confirmText = "ЗАВЕРШИТЬ",
+                onConfirm = {
+                    showFinishDialog = false
+                    onFinish()
+                },
+                cancelText = "ОТМЕНА",
+                onDismiss = { showFinishDialog = false },
+            )
         }
 
         if (isLandscape) {
@@ -208,6 +227,7 @@ private fun GameContent(
                 players = uiState.players,
                 current = current,
                 currentStreak = uiState.currentStreak,
+                buttonsEnabled = buttonsEnabled,
                 onPocket = onPocket,
                 onMiss = onMiss,
                 modifier = Modifier.weight(1f),
@@ -217,6 +237,7 @@ private fun GameContent(
                 players = uiState.players,
                 current = current,
                 currentStreak = uiState.currentStreak,
+                buttonsEnabled = buttonsEnabled,
                 onPocket = onPocket,
                 onMiss = onMiss,
                 modifier = Modifier.weight(1f),
@@ -236,6 +257,7 @@ private fun PortraitContent(
     players: List<PlayerUi>,
     current: PlayerUi?,
     currentStreak: Int,
+    buttonsEnabled: Boolean,
     onPocket: () -> Unit,
     onMiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -271,12 +293,14 @@ private fun PortraitContent(
         Spacer(modifier = Modifier.weight(1f))
         KolhozButton(
             text = "ЗАБИЛ",
+            enabled = buttonsEnabled,
             onClick = onPocket,
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(KolhozSpacing.M))
         KolhozSecondaryButton(
             text = "ПРОМАХ",
+            enabled = buttonsEnabled,
             onClick = onMiss,
             modifier = Modifier.fillMaxWidth(),
         )
@@ -288,6 +312,7 @@ private fun LandscapeContent(
     players: List<PlayerUi>,
     current: PlayerUi?,
     currentStreak: Int,
+    buttonsEnabled: Boolean,
     onPocket: () -> Unit,
     onMiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -342,12 +367,14 @@ private fun LandscapeContent(
             Spacer(modifier = Modifier.height(KolhozSpacing.M))
             KolhozButton(
                 text = "ЗАБИЛ",
+                enabled = buttonsEnabled,
                 onClick = onPocket,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(modifier = Modifier.height(KolhozSpacing.M))
             KolhozSecondaryButton(
                 text = "ПРОМАХ",
+                enabled = buttonsEnabled,
                 onClick = onMiss,
                 modifier = Modifier.fillMaxWidth(),
             )

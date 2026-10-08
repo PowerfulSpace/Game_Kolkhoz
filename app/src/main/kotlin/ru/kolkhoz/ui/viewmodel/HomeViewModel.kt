@@ -12,6 +12,8 @@ import kotlinx.coroutines.launch
 import ru.kolkhoz.domain.repository.GameRepository
 import ru.kolkhoz.ui.model.HomeUiState
 
+private const val LOAD_ERROR_MESSAGE = "Не удалось загрузить партию"
+
 /**
  * ViewModel главного экрана.
  *
@@ -32,8 +34,22 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.observeActiveGame().collect { game ->
-                _uiState.update { it.copy(hasActiveGame = game != null, isLoading = false) }
+            try {
+                repository.observeActiveGame().collect { game ->
+                    _uiState.update {
+                        it.copy(hasActiveGame = game != null, isLoading = false)
+                    }
+                }
+            } catch (e: Exception) {
+                // Ошибка Flow (например, БД) не должна ронять приложение;
+                // UI_SPEC.md 2.5 — snackbar «Не удалось загрузить партию».
+                _uiState.update {
+                    it.copy(
+                        hasActiveGame = false,
+                        isLoading = false,
+                        errorMessage = LOAD_ERROR_MESSAGE,
+                    )
+                }
             }
         }
     }

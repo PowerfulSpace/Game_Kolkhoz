@@ -12,6 +12,9 @@ package ru.kolkhoz.ui.model
  * @property nameErrors Inline-ошибки имён: по элементу на
  *   игрока; `null` — ошибки нет, иначе текст подсказки
  *   (UI_SPEC.md 3.5).
+ * @property isSaving Идёт ли сохранение новой партии; пока
+ *   `true` — кнопка «НАЧАТЬ ИГРУ» заблокирована
+ *   (защита от дабл-тапа).
  * @property errorMessage Человеческое сообщение об ошибке
  *   создания; `null` — ошибки нет.
  */
@@ -20,5 +23,6 @@ data class NewGameUiState(
     val playerNames: List<String> = List(4) { "" },
     val canStartGame: Boolean = false,
     val nameErrors: List<String?> = List(4) { null },
+    val isSaving: Boolean = false,
     val errorMessage: String? = null,
 )

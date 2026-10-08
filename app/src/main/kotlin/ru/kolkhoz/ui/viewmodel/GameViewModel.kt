@@ -69,11 +69,17 @@ class GameViewModel @Inject constructor(
     /** Последнее отменённое событие — для redo (null — redo недоступен). */
     private var lastUndoneEvent: GameEvent? = null
 
+    /** Флаг сохранения (защита от дабл-тапа кнопок удара). */
+    private var isSaving = false
+
     init {
         viewModelScope.launch {
             repository.observeActiveGame().collect { game ->
                 _isLoading.value = false
                 currentGame = game
+                // Запись завершена и состояние пришло из Room —
+                // разблокируем кнопки (см. save()).
+                isSaving = false
                 _currentGameId.value = game?.id
                 _historyUiState.value = game?.toHistoryUiState()
                     ?: HistoryUiState(events = emptyList(), isEmpty = true)
@@ -81,6 +87,7 @@ class GameViewModel @Inject constructor(
                     GameRules.recompute(game).toGameUiState(
                         lastUndoneEvent = lastUndoneEvent,
                         canUndo = game.events.isNotEmpty(),
+                        isSaving = false,
                     )
                 } else {
                     null
@@ -154,13 +161,26 @@ class GameViewModel @Inject constructor(
     /**
      * Сохраняет партию; при ошибке — человеческое сообщение
      * в errorMessage (UI_SPEC.md, 9.2).
+     *
+     * Флаг [isSaving] снимается либо по ошибке, либо при
+     * следующем emission из Room (в init) — разблокировка
+     * до обновления [currentGame] вернула бы дабл-тап.
      */
     private fun save(game: Game) {
+        if (isSaving) return
+        isSaving = true
+        _uiState.update { it?.copy(isSaving = true) }
         viewModelScope.launch {
             try {
                 repository.saveGame(game)
             } catch (e: Exception) {
-                _uiState.update { it?.copy(errorMessage = SAVE_ERROR_MESSAGE) }
+                isSaving = false
+                _uiState.update {
+                    it?.copy(
+                        errorMessage = SAVE_ERROR_MESSAGE,
+                        isSaving = false,
+                    )
+                }
             }
         }
     }

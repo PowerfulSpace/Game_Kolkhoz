@@ -1,7 +1,17 @@
 package ru.kolkhoz.navigation
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.pm.ActivityInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -10,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import kotlinx.coroutines.launch
 import ru.kolkhoz.domain.model.GameId
 import ru.kolkhoz.ui.screens.GameScreen
 import ru.kolkhoz.ui.screens.HistoryScreen
@@ -74,6 +85,7 @@ fun KolkhozNavHost(
         startDestination = Routes.HOME,
     ) {
         composable(Routes.HOME) {
+            LockPortrait()
             val viewModel: HomeViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             HomeScreen(
@@ -86,8 +98,21 @@ fun KolkhozNavHost(
         }
 
         composable(Routes.NEW_GAME) {
+            LockPortrait()
             val viewModel: NewGameViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            var showActiveGameDialog by remember { mutableStateOf(false) }
+            val scope = rememberCoroutineScope()
+
+            // Начало игры: проверка активной партии (UI_SPEC.md 3.4, 8.2).
+            val startGame = {
+                viewModel.onStartGame { _: GameId ->
+                    navController.navigate(Routes.GAME) {
+                        popUpTo(Routes.NEW_GAME) { inclusive = true }
+                    }
+                }
+            }
+
             NewGameScreen(
                 uiState = uiState,
                 onPlayerCountChange = viewModel::onPlayerCountChange,
@@ -95,11 +120,23 @@ fun KolkhozNavHost(
                 onDeletePlayer = viewModel::onDeletePlayer,
                 onBack = { navController.popBackStack() },
                 onStartGame = {
-                    viewModel.onStartGame { _: GameId ->
-                        navController.navigate(Routes.GAME) {
-                            popUpTo(Routes.NEW_GAME) { inclusive = true }
+                    scope.launch {
+                        if (viewModel.hasActiveGame()) {
+                            showActiveGameDialog = true
+                        } else {
+                            startGame()
                         }
                     }
+                },
+                showActiveGameDialog = showActiveGameDialog,
+                onConfirmFinishActive = {
+                    scope.launch {
+                        viewModel.finishActiveGame()
+                        startGame()
+                    }
+                },
+                onCancelFinishActive = {
+                    showActiveGameDialog = false
                 },
                 onErrorShown = viewModel::clearError,
             )
@@ -146,6 +183,7 @@ fun KolkhozNavHost(
                 navArgument("gameId") { type = NavType.StringType },
             ),
         ) {
+            LockPortrait()
             val viewModel: ResultViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             ResultScreen(
@@ -164,4 +202,35 @@ fun KolkhozNavHost(
             )
         }
     }
+}
+
+/**
+ * Блокирует ориентацию экрана в portrait на время жизни
+ * composable (UI_SPEC.md 1.2: Home, NewGame, Result — только
+ * portrait; Game и History работают в обеих ориентациях).
+ *
+ * При выходе из composable исходная ориентация восстанавливается.
+ */
+@Composable
+private fun LockPortrait() {
+    val context = LocalContext.current
+    DisposableEffect(Unit) {
+        val activity = context.findActivity()
+        val original = activity?.requestedOrientation
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        onDispose {
+            activity?.requestedOrientation =
+                original ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+    }
+}
+
+/** Находит Activity из контекста Compose (обход ContextWrapper). */
+private fun Context.findActivity(): Activity? {
+    var ctx: Context = this
+    while (ctx is ContextWrapper) {
+        if (ctx is Activity) return ctx
+        ctx = ctx.baseContext
+    }
+    return null
 }

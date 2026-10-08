@@ -8,6 +8,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.kolkhoz.domain.model.GameId
@@ -43,6 +44,26 @@ class NewGameViewModel @Inject constructor(
 
     /** Состояние экрана создания игры. */
     val uiState: StateFlow<NewGameUiState> = _uiState.asStateFlow()
+
+    /** Флаг сохранения (защита от дабл-тапа «НАЧАТЬ ИГРУ»). */
+    private var isSaving = false
+
+    /**
+     * Проверяет, есть ли активная партия. Используется
+     * экраном перед созданием новой (UI_SPEC.md 3.4, 8.2).
+     */
+    suspend fun hasActiveGame(): Boolean {
+        return repository.observeActiveGame().first() != null
+    }
+
+    /**
+     * Завершает активную партию (если есть).
+     * Вызывается перед созданием новой (UI_SPEC.md 8.2).
+     */
+    suspend fun finishActiveGame() {
+        val active = repository.observeActiveGame().first() ?: return
+        repository.saveGame(GameRules.finishGame(active))
+    }
 
     /**
      * Меняет количество игроков (3..8): при увеличении добавляет
@@ -95,6 +116,7 @@ class NewGameViewModel @Inject constructor(
      * @param onSuccess Вызывается после успешного сохранения.
      */
     fun onStartGame(onSuccess: (GameId) -> Unit) {
+        if (isSaving) return
         val names = _uiState.value.playerNames
         val players = names.mapIndexed { index, name ->
             Player(
@@ -114,12 +136,17 @@ class NewGameViewModel @Inject constructor(
             return
         }
 
+        isSaving = true
+        _uiState.update { it.copy(isSaving = true) }
         viewModelScope.launch {
             try {
                 repository.saveGame(game)
                 onSuccess(game.id)
             } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = "Не удалось сохранить партию") }
+                isSaving = false
+                _uiState.update {
+                    it.copy(errorMessage = "Не удалось сохранить партию", isSaving = false)
+                }
             }
         }
     }
