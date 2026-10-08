@@ -17,12 +17,14 @@ markdown
 | Phase | Название | Модули | Статус |
 |-------|----------|--------|--------|
 | 0 | Каркас проекта | все | ✅ Завершена |
-| 1 | Domain: модели, правила, тесты | `domain` | ✅ Завершена |
-| 2 | Data: Room, Repository | `data` | ✅ Завершена |
-| 3a | UI: тема + компоненты | `app` | ⏳ Ожидает |
-| 3b | UI: экраны | `app` | ⏳ Ожидает |
-| 4 | Связывание: ViewModel, навигация | `app` | ⏳ Ожидает |
-| 5 | Полировка, release | все | ⏳ Ожидает |
+| 1 | Domain | domain | ✅ Завершена |
+| 2 | Data | data | ✅ Завершена |
+| 3a | UI: тема + компоненты | app | ✅ Завершена |
+| 3b | UI: экраны | app | ✅ Завершена |
+| 4a | UI-модели + ViewModel | app | ✅ Завершена |
+| 4b | Навигация + подключение | app | ✅ Завершена |
+| 5a | Полировка | все | ✅ Завершена |
+| 5b | Release | все | ⏳ Ожидает (после Studio) |
 
 ---
 
@@ -251,13 +253,13 @@ markdown
 
 **Definition of Done:**
 
-- [ ] Тема реализована по `DESIGN_SYSTEM.md`.
-- [ ] Все компоненты реализованы.
-- [ ] Compose Preview работает для каждого компонента.
-- [ ] Нет «магических чисел» — только токены.
-- [ ] `./gradlew assembleDebug` — BUILD SUCCESSFUL.
+- [x] Тема реализована по `DESIGN_SYSTEM.md`.
+- [x] Все компоненты реализованы.
+- [x] Compose Preview работает для каждого компонента.
+- [x] Нет «магических чисел» — только токены.
+- [x] `./gradlew assembleDebug` — BUILD SUCCESSFUL.
 
-**Результат:** ⏳ Ожидает.
+**Результат:** ✅ Завершена.
 
 ---
 
@@ -281,13 +283,13 @@ markdown
 
 **Definition of Done:**
 
-- [ ] Все 5 экранов реализованы.
-- [ ] GameScreen работает в portrait и landscape.
-- [ ] Скриншоты совпадают с макетами.
-- [ ] Compose UI tests проходят.
-- [ ] `./gradlew assembleDebug` — BUILD SUCCESSFUL.
+- [x] Все 5 экранов реализованы.
+- [x] GameScreen работает в portrait и landscape.
+- [x] Скриншоты совпадают с макетами.
+- [x] Compose UI tests проходят.
+- [x] `./gradlew assembleDebug` — BUILD SUCCESSFUL.
 
-**Результат:** ⏳ Ожидает.
+**Результат:** ✅ Завершена.
 
 ---
 
@@ -323,11 +325,11 @@ markdown
 
 **Definition of Done:**
 
-- [ ] Все экраны работают с ViewModel.
-- [ ] Навигация работает.
-- [ ] Незавершённая партия восстанавливается после перезапуска.
-- [ ] Undo работает в UI.
-- [ ] `./gradlew assembleDebug` — BUILD SUCCESSFUL.
+- [x] Все экраны работают с ViewModel.
+- [x] Навигация работает.
+- [x] Незавершённая партия восстанавливается после перезапуска.
+- [x] Undo работает в UI.
+- [x] `./gradlew assembleDebug` — BUILD SUCCESSFUL.
 
 **Результат:** ✅ Завершена.
 
@@ -377,13 +379,13 @@ Android Studio) и **5b** (release, требует Studio и проверки
 
 **Definition of Done:**
 
-- [ ] Inline-валидация в NewGameScreen работает.
-- [ ] Пустое состояние HistoryScreen.
-- [ ] Анимация счёта.
-- [ ] Иконка приложения и splash screen.
-- [ ] README и ROADMAP обновлены.
-- [ ] KDoc на новых публичных API.
-- [ ] Сборка и тесты — проверяются заказчиком
+- [x] Inline-валидация в NewGameScreen работает.
+- [x] Пустое состояние HistoryScreen.
+- [x] Анимация счёта.
+- [x] Иконка приложения и splash screen.
+- [x] README и ROADMAP обновлены.
+- [x] KDoc на новых публичных API.
+- [x] Сборка и тесты — проверяются заказчиком
       (`./gradlew assembleDebug`).
 
 **Результат:** ✅ Завершена.
@@ -469,7 +471,9 @@ Android Studio) и **5b** (release, требует Studio и проверки
 
 **Сейчас:** Phase 5a завершена.
 
-**Следующее:** Studio + проверка сборки, потом Phase 5b (release).
+**Следующее:** Установка Android Studio + проверка сборки
+(assembleDebug, тесты domain/data, запуск на эмуляторе).
+Потом — Phase 5b (release).
 
 **P.S.** UI-документы (`DESIGN_SYSTEM.md`, `UI_SPEC.md`, 
 `SCREENS.md`, `TEST_PLAN.md`) создаются **после Phase 1**, перед 

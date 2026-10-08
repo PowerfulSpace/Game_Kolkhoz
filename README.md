@@ -36,6 +36,21 @@ Android-приложение для подсчёта очков в бильяр�
 
 (требуется Android SDK)
 
+## Сборка release
+
+```bash
+./gradlew assembleRelease
+```
+
+Требуется настроенный signing (keystore) в
+`app/build.gradle.kts`. Настраивается в Phase 5b.
+
+## Статус
+
+- Phase 0–5a: ✅ завершены.
+- Phase 5b (release): ⏳ ожидает проверки сборки
+  в Android Studio.
+
 ## Документация
 
 - docs/SPEC.md — спецификация продукта

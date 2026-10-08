@@ -18,16 +18,21 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            // TODO: После проверки сборки в Android Studio —
+            // включить isMinifyEnabled = true и isShrinkResources = true,
+            // протестировать release-сборку, убедиться, что Hilt, Room,
+            // Compose работают без дополнительных proguard-правил.
         }
     }
 
