@@ -51,6 +51,13 @@ position — метаданные игрока. Определяет логич�
 position НЕ участвует в правилах напрямую. Все игровые 
 функции работают с порядком списка.
 
+При персистентности (Phase 2) в таблице `players` порядок 
+списка хранится отдельно от метаданных: `position` — то же, что 
+в domain, `listOrder` — индекс игрока в Game.players (0..N-1). 
+Загрузка делает ORDER BY по listOrder, а не по position: цикл 
+GameRules строится по порядку списка, поэтому порядок обязан 
+восстанавливаться буквально.
+
 2.2. ShotResult
 Результат удара.
 
@@ -447,6 +454,24 @@ previousPlayerIdInCycle(Петя) = Саша
 
 Используется только для определения штрафа при первом
 событии партии.
+
+3.8. GameRepository
+Контракт доступа к хранилищу: domain/repository/GameRepository.kt.
+
+ЕДИНСТВЕННОЕ место в domain, где допустимы suspend и Flow: 
+это контракт с внешним миром (persistence), а не правила игры. 
+GameRules остаётся чистой и синхронной.
+
+Методы:
+- suspend saveGame(game) — создать или обновить.
+- suspend loadGame(id): Game? — null, если не найдена.
+- observeActiveGame(): Flow<Game?> — последняя активная по 
+  createdAtMillis; null, если активной нет.
+- observeAllGames(): Flow<List<Game>> — все партии, свежие первыми.
+- suspend deleteGame(id).
+
+Реализация — LocalGameRepository в data/repository/. Domain не 
+знает, откуда данные: Room, сеть или память.
 
 4. Инварианты
 Следующие утверждения всегда истинны для любой валидной Game

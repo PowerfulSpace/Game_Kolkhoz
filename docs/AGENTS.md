@@ -100,8 +100,10 @@ text
 - **Hilt** — DI.
 - **Room** — локальная БД.
 - **KSP** — кодогенерация.
-- **Coroutines + Flow** — асинхронность (в domain — пока не нужны).
-- **JUnit5** — тесты.
+- **Coroutines + Flow** — асинхронность (в `domain` — только 
+  `GameRepository`; `GameRules` остаётся синхронным).
+- **JUnit5** — основной тестовый движок. Для Room/Robolectric-тестов 
+  используется JUnit4 через junit-vintage-engine (см. 6.4).
 
 **AGP 9.0+**: плагин `org.jetbrains.kotlin.android` не применяется, 
 AGP содержит встроенный Kotlin. Это не обход, а новый путь.
@@ -169,6 +171,20 @@ AGP содержит встроенный Kotlin. Это не обход, а н�
 - Имя теста описывает сценарий: `applyShot with wrong player throws`.
 - Один тест — одна проверка (или группа связанных).
 - Никаких `Thread.sleep()` — детерминированность.
+
+### 6.4. Разделение JUnit4 / JUnit5
+
+- Pure unit (`domain`, мапперы `data`) → **JUnit5** 
+  (`org.junit.jupiter.api.Test`).
+- Room DAO и `LocalGameRepository` → **JUnit4 + Robolectric** 
+  (`org.junit.Test` + `@RunWith(RobolectricTestRunner::class)`): 
+  `Room.inMemoryDatabaseBuilder` требует Android-контекст и SQLite, 
+  что даёт только Robolectric.
+- Оба движка сосуществуют в одном `useJUnitPlatform()`: JUnit4 
+  запускается junit-vintage-engine.
+
+Зависимости (`data/build.gradle.kts`): `junit-vintage`, 
+`robolectric`, `androidx.test:core`, `kotlinx-coroutines-test`.
 
 ---
 

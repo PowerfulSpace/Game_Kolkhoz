@@ -137,7 +137,11 @@ text
 - **Никаких `System.currentTimeMillis()`** — время приходит 
   параметром.
 - **Никакого `Random`.**
-- **Никаких suspend-функций** (в MVP).
+- **Никаких suspend-функций, КРОМЕ `GameRepository`.** 
+  Интерфейс репозитория (`domain/repository/GameRepository.kt`) — 
+  единственное место в domain, где допустимы suspend и `Flow`: 
+  это контракт с внешним миром (persistence), а не правила игры. 
+  `GameRules` остаётся чистой и синхронной.
 - **Все модели — immutable.**
 - **Все функции — чистые.**
 
@@ -186,9 +190,15 @@ text
 Три таблицы:
 
 - `games` — `id`, `createdAtMillis`, `status`.
-- `players` — `id`, `gameId`, `name`, `position`.
+- `players` — `id`, `gameId`, `name`, `position`, `listOrder`.
 - `game_events` — `id`, `gameId`, `sequenceNumber`, `playerId`, 
   `result`, `timestampMillis`.
+
+**Поля `players`:** `position` — метаданные из domain (в правилах 
+не участвуют, хранятся для буквального round-trip); `listOrder` — 
+порядок игрока в `Game.players` (0..N-1), по нему `ORDER BY` при 
+загрузке: цикл GameRules строится по порядку списка, а не по 
+position.
 
 Связи: `games 1—N players`, `games 1—N game_events`.
 

@@ -20,6 +20,13 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
+    testOptions {
+        unitTests {
+            // Robolectric нуждается в ресурсах Android в unit-тестах.
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 kotlin {
@@ -43,8 +50,24 @@ dependencies {
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
+
+    // Разделение тестов (AGENTS.md, раздел 6.4):
+    //  - мапперы и чистая логика — JUnit5 (org.junit.jupiter.api.Test);
+    //  - Room DAO и LocalGameRepository — JUnit4 + Robolectric
+    //    (@RunWith(RobolectricTestRunner::class)), запускаются vintage-движком.
+    // Оба движка сосуществуют в одном ./gradlew :data:test.
+    testImplementation(libs.junit.vintage)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+
+    // Robolectric (ApplicationSharedMemory.create) обращается к
+    // jdk.internal.access.SharedSecrets: модульная система Java 21 не отдаёт
+    // этот пакет unnamed module без явной отдачи, из-за чего все Room-тесты
+    // падают с IllegalAccessException.
+    jvmArgs("--add-exports", "java.base/jdk.internal.access=ALL-UNNAMED")
 }
