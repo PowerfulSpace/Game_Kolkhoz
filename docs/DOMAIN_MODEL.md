@@ -40,9 +40,16 @@ data class Player(
 )
 id — уникален внутри партии.
 
-name — от 1 до N символов, уникален внутри партии.
+name — от 1 до 32 символов, уникально в партии без учёта 
+регистра и пробелов.
 
-position — определяет порядок хода. Не меняется после создания.
+position — метаданные игрока. Определяет логический порядок. 
+Цикл в GameRules строится по порядку списка Game.players, 
+который соответствует position. position валидируется при 
+создании: уникален, 0..N-1. Не меняется после создания.
+
+position НЕ участвует в правилах напрямую. Все игровые 
+функции работают с порядком списка.
 
 2.2. ShotResult
 Результат удара.
@@ -174,15 +181,11 @@ object GameRules {
 
 Правила валидации:
 
-players.size в диапазоне 3..8.
-
-Все имена не пустые и не состоят из пробелов.
-
-Все имена уникальны (без учёта регистра).
-
-Длина имени — от 1 до 32 символов (уточняется).
-
-position у игроков — уникальные, 0..N-1.
+1. players.size в 3..8.
+2. имена не пустые (isBlank).
+3. имена не длиннее 32.
+4. имена уникальны без учёта регистра и пробелов.
+5. position уникальны и 0..N-1.
 
 Возвращает: Result<Game>.
 
@@ -193,14 +196,24 @@ Failure(error) — если нет.
 Ошибки — sealed class:
 
 kotlin
-sealed class GameError {
-    data object TooFewPlayers : GameError()
-    data object TooManyPlayers : GameError()
-    data class EmptyName(val playerId: PlayerId) : GameError()
-    data class DuplicateName(val name: String) : GameError()
-    data class NameTooLong(val name: String, val maxLength: Int) : GameError()
-    data class InvalidPosition(val playerId: PlayerId) : GameError()
+sealed class GameError(message: String) : Exception(message) {
+    data class TooFewPlayers(val actual: Int) : GameError(...)
+    data class TooManyPlayers(val actual: Int) : GameError(...)
+    data class EmptyName(val playerId: PlayerId) : GameError(...)
+    data class DuplicateName(val name: String) : GameError(...)
+    data class NameTooLong(val name: String, val maxLength: Int) : GameError(...)
+    data class InvalidPositions(val positions: List<Int>) : GameError(...)
 }
+
+GameError : Exception — техническая необходимость: 
+Result.failure() принимает только Throwable. Это НЕ управление 
+логикой через исключения: поток управления не прерывается, 
+вызывающий код читает ошибку через Result.
+
+InvalidPositions(positions) покрывает и дубликаты, и выход за 
+диапазон: в список передаются позиции всех игроков в порядке 
+списка.
+
 Пример:
 
 kotlin
@@ -444,6 +457,8 @@ players.size в диапазоне 3..8.
 Все position уникальны и в диапазоне 0..players.size-1.
 
 Все имена уникальны (без учёта регистра).
+
+Все имена длиной 1..32.
 
 events упорядочены по sequenceNumber (1, 2, 3, ...).
 

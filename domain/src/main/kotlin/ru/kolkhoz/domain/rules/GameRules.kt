@@ -36,9 +36,27 @@ sealed class GameError(message: String) : Exception(message) {
     data class EmptyName(val playerId: PlayerId) :
         GameError("Игрок $playerId имеет пустое имя")
 
-    /** Имя повторяется в партии. */
+    /** Имя повторяется в партии (сравнение без учёта регистра и пробелов). */
     data class DuplicateName(val name: String) :
         GameError("Имя повторяется в партии: \"$name\"")
+
+    /** Имя длиннее допустимого лимита. */
+    data class NameTooLong(val name: String, val maxLength: Int) :
+        GameError("Имя слишком длинное: \"$name\" (${name.length} > $maxLength)")
+
+    /**
+     * Позиции игроков не образуют точную перестановку `0..N-1`:
+     * есть дубликаты и/или выход за диапазон.
+     *
+     * @property positions позиции всех игроков **в порядке списка** — по ним видно
+     *   и дубликат, и «лишнюю» позицию, поэтому в список включается весь ряд,
+     *   а не только нарушившие элементы
+     */
+    data class InvalidPositions(val positions: List<Int>) :
+        GameError(
+            "Некорректные позиции игроков: $positions — " +
+                "должны быть уникальны и в диапазоне 0..N-1",
+        )
 }
 
 /**
@@ -61,13 +79,22 @@ object GameRules {
     /** Максимальное число игроков в партии. */
     private const val MAX_PLAYERS = 8
 
+    /** Максимальная длина имени игрока. */
+    private const val MAX_NAME_LENGTH = 32
+
     /**
      * Создаёт новую партию с фиксированным порядком игроков.
      *
      * Валидация (в этом порядке):
      * 1. число игроков от [MIN_PLAYERS] до [MAX_PLAYERS];
      * 2. имена не пустые (и не состоят только из пробелов);
-     * 3. имена уникальны (сравнение точное, без нормализации регистра).
+     * 3. имена не длиннее [MAX_NAME_LENGTH] символов;
+     * 4. имена уникальны — сравнение без учёта регистра и ведущих/замыкающих
+     *    пробелов (само имя при этом хранится ровно как введено);
+     * 5. позиции уникальны и в диапазоне `0..players.size - 1`.
+     *
+     * `position` — только метаданные: createGame НЕ сортирует players,
+     * порядок списка остаётся таким, каким был передан, и именно он определяет цикл.
      *
      * Возвращает `Result`, а не бросает исключения: Part 5 запрещает исключения
      * для управления логикой, а `Result` — штатный механизм Kotlin для «любого»
@@ -94,11 +121,31 @@ object GameRules {
         players.firstOrNull { it.name.isBlank() }?.let {
             return Result.failure(GameError.EmptyName(it.id))
         }
+        players.firstOrNull { it.name.length > MAX_NAME_LENGTH }?.let {
+            return Result.failure(GameError.NameTooLong(it.name, MAX_NAME_LENGTH))
+        }
+        // Нормализация — ТОЛЬКО для сравнения: trim() отсекает ведущие/замыкающие
+        // пробелы, lowercase() делает сравнение регистронезависимым; оригинальные
+        // имена хранятся как введены — данные пользователя не мутируем.
+        // Выбран один set с нормализованным ключом: O(n) и одно место нормализации.
+        // Вариант с equals(ignoreCase = true) потребовал бы сравнения каждой пары
+        // (O(n²)), а trim() всё равно пришлось бы применять отдельно.
+        // lowercase() без аргумента в Kotlin локале-независим — детерминирован
+        // на любой машине (инвариант «детерминированность domain»).
         val seen = mutableSetOf<String>()
         for (player in players) {
-            if (!seen.add(player.name)) {
+            val normalizedName = player.name.trim().lowercase()
+            if (!seen.add(normalizedName)) {
                 return Result.failure(GameError.DuplicateName(player.name))
             }
+        }
+        // Позиции обязаны быть точной перестановкой 0..N-1: дубликаты или выход
+        // за диапазон ломали бы цикл и «съедали» бы игроков.
+        val positions = players.map { it.position }
+        val positionsValid = positions.size == positions.toSet().size &&
+            positions.all { it in 0 until players.size }
+        if (!positionsValid) {
+            return Result.failure(GameError.InvalidPositions(positions))
         }
         return Result.success(
             Game(
@@ -180,7 +227,9 @@ object GameRules {
 
         return GameState(
             players = players,
-            scores = scores,
+            // toMap(): GameState обязан получать неизменяемую копию — MutableMap
+            // не должен утекать наружу (иммутабельность domain-модели).
+            scores = scores.toMap(),
             currentPlayerId = currentPlayerId,
             currentStreak = currentStreak,
             lastShooterId = lastShooterId,
