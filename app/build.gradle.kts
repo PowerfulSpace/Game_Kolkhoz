@@ -60,8 +60,8 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
-    // Circle, Undo и другие иконки вне material-icons-core (см. DESIGN_SYSTEM.md §10).
-    implementation(libs.compose.material.icons.extended)
+    // Базовые Icons.Filled.* (core). Расширенный набор не используем.
+    implementation(libs.compose.material.icons.core)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

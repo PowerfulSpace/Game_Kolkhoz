@@ -277,8 +277,7 @@ text
 - **Height:** 56dp (обычная), 48dp (компактная).
 - **Padding:** 12–16dp.
 - **Имя:** `BodyMedium`, цвет `TextPrimary`.
-- **Счёт:** `Body` + Bold, цвет: `Positive` / `Negative` / 
-  `TextPrimary` (0).
+- **Счёт:** `Body` + Bold, цвет: см. ScoreText (§9.3).
 - **Левый индикатор:** ● (точка) — если текущий игрок.
 
 ### 9.2. `CurrentPlayerCard`

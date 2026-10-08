@@ -242,6 +242,13 @@ markdown
 3. Compose Preview для каждого компонента.
 4. Никаких экранов.
 
+**Отклонения, зафиксированные:**
+
+- `Theme.kt` перенесён в `src/main/kotlin/` (единообразие
+  с остальными файлами Phase 3a).
+- `material-icons-extended` удалён, заменён на два
+  vector drawable (`ic_pocket`, `ic_undo`).
+
 **Definition of Done:**
 
 - [ ] Тема реализована по `DESIGN_SYSTEM.md`.
