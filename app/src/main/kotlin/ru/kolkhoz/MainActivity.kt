@@ -4,8 +4,12 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import ru.kolkhoz.navigation.KolkhozNavHost
+import ru.kolkhoz.ui.theme.KolhozColors
 import ru.kolkhoz.ui.theme.KolkhozTheme
 
 /**
@@ -32,7 +36,12 @@ class MainActivity : ComponentActivity() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         setContent {
             KolkhozTheme {
-                KolkhozNavHost()
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = KolhozColors.Background,
+                ) {
+                    KolkhozNavHost()
+                }
             }
         }
     }
