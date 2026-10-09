@@ -15,6 +15,7 @@ import ru.kolkhoz.domain.model.GameId
 import ru.kolkhoz.domain.model.Player
 import ru.kolkhoz.domain.model.PlayerId
 import ru.kolkhoz.domain.repository.GameRepository
+import ru.kolkhoz.domain.rules.GameError
 import ru.kolkhoz.domain.rules.GameRules
 import ru.kolkhoz.ui.model.NewGameUiState
 import ru.kolkhoz.ui.util.toHumanMessage
@@ -26,6 +27,7 @@ private const val MAX_NAME_LENGTH = 32
 private const val EMPTY_NAME_ERROR = "Введите имя игрока"
 private const val DUPLICATE_NAME_ERROR = "Такое имя уже есть"
 private const val LONG_NAME_ERROR = "Имя слишком длинное"
+private const val CREATE_GAME_ERROR = "Не удалось создать партию"
 
 /**
  * ViewModel экрана создания игры (UI_SPEC.md, раздел 3).
@@ -132,7 +134,9 @@ class NewGameViewModel @Inject constructor(
         )
 
         val game = result.getOrElse { error ->
-            _uiState.update { it.copy(errorMessage = error.toHumanMessage()) }
+            // getOrElse отдаёт Throwable; toHumanMessage определён для GameError.
+            val message = (error as? GameError)?.toHumanMessage() ?: CREATE_GAME_ERROR
+            _uiState.update { it.copy(errorMessage = message) }
             return
         }
 

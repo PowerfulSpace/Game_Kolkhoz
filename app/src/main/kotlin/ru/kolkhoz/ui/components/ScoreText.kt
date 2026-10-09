@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import ru.kolkhoz.ui.theme.KolhozColors
 import ru.kolkhoz.ui.theme.KolhozSpacing
-import ru.kolkhoz.ui.theme.KolhozTheme
+import ru.kolkhoz.ui.theme.KolkhozTheme
 import ru.kolkhoz.ui.theme.KolhozTypography
 
 /**
@@ -75,7 +75,7 @@ internal fun formatScore(score: Int): String = when {
 @Preview(showBackground = true, backgroundColor = 0xFF08110F)
 @Composable
 private fun ScoreTextPreview() {
-    KolhozTheme {
+    KolkhozTheme {
         Column(
             modifier = Modifier.padding(KolhozSpacing.L),
             verticalArrangement = Arrangement.spacedBy(KolhozSpacing.S),

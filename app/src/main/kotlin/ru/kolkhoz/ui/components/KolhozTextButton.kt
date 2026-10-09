@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.LocalIndication
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import ru.kolkhoz.ui.theme.KolhozColors
 import ru.kolkhoz.ui.theme.KolhozRadius
 import ru.kolkhoz.ui.theme.KolhozSpacing
-import ru.kolkhoz.ui.theme.KolhozTheme
+import ru.kolkhoz.ui.theme.KolkhozTheme
 import ru.kolkhoz.ui.theme.KolhozTypography
 
 /**
@@ -65,7 +64,7 @@ fun KolhozTextButton(
             .background(background)
             .clickable(
                 interactionSource = interactionSource,
-                indication = LocalIndication.current,
+                indication = null,
                 enabled = enabled,
                 role = Role.Button,
                 onClick = onClick,
@@ -83,7 +82,7 @@ fun KolhozTextButton(
 @Preview(showBackground = true, backgroundColor = 0xFF08110F)
 @Composable
 private fun KolhozTextButtonPreview() {
-    KolhozTheme {
+    KolkhozTheme {
         Column(
             modifier = Modifier.padding(KolhozSpacing.L),
             verticalArrangement = Arrangement.spacedBy(KolhozSpacing.S),

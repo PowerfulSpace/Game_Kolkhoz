@@ -8,7 +8,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -19,9 +18,9 @@ import ru.kolkhoz.R
  * Централизованный набор иконок MVP (DESIGN_SYSTEM.md, раздел 10).
  *
  * Источник — Material Icons core (не Unicode-символы: те
- * рендерятся по-разному на разных устройствах). [Pocket] и
- * [Undo] — свои vector drawable (res/drawable/), потому что их
- * нет в core. Кубок — растровый ассет `R.drawable.trophy`
+ * рендерятся по-разному на разных устройствах). [Pocket],
+ * [Undo] и [Decrease] — свои vector drawable (res/drawable/),
+ * потому что их нет в core. Кубок — растровый ассет `R.drawable.trophy`
  * (см. ResultScreen в Phase 3b), здесь его нет, потому что
  * это не [ImageVector].
  */
@@ -38,7 +37,7 @@ object KolkhozIcons {
      */
     val Undo: ImageVector
         @Composable
-        get() = vectorResource(R.drawable.ic_undo)
+        get() = ImageVector.vectorResource(R.drawable.ic_undo)
 
     /** История (☰). */
     val History: ImageVector = Icons.Filled.Menu
@@ -55,7 +54,7 @@ object KolkhozIcons {
      */
     val Pocket: ImageVector
         @Composable
-        get() = vectorResource(R.drawable.ic_pocket)
+        get() = ImageVector.vectorResource(R.drawable.ic_pocket)
 
     /** Промах (×), красный через tint. */
     val Miss: ImageVector = Icons.Filled.Close
@@ -69,8 +68,13 @@ object KolkhozIcons {
     /** Кнопка «назад» в топ-баре. */
     val Back: ImageVector = Icons.AutoMirrored.Filled.ArrowBack
 
-    /** Уменьшить (−) в счётчике игроков. */
-    val Decrease: ImageVector = Icons.Filled.Remove
+    /**
+     * Уменьшить (−) в счётчике игроков — свой drawable
+     * `ic_remove` (нет в material-icons-core), цвет через tint.
+     */
+    val Decrease: ImageVector
+        @Composable
+        get() = ImageVector.vectorResource(R.drawable.ic_remove)
 
     /** Увеличить (+) в счётчике игроков. */
     val Increase: ImageVector = Icons.Filled.Add

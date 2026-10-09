@@ -18,7 +18,7 @@ import androidx.compose.ui.window.Dialog
 import ru.kolkhoz.ui.theme.KolhozColors
 import ru.kolkhoz.ui.theme.KolhozRadius
 import ru.kolkhoz.ui.theme.KolhozSpacing
-import ru.kolkhoz.ui.theme.KolhozTheme
+import ru.kolkhoz.ui.theme.KolkhozTheme
 import ru.kolkhoz.ui.theme.KolhozTypography
 
 /**
@@ -90,7 +90,7 @@ fun KolhozDialog(
 @Preview(showBackground = true, backgroundColor = 0xFF08110F)
 @Composable
 private fun KolhozDialogPreview() {
-    KolhozTheme {
+    KolkhozTheme {
         KolhozDialog(
             title = "ЗАВЕРШИТЬ ИГРУ?",
             text = "Текущая партия будет сохранена в истории.",

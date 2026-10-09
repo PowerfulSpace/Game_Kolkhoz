@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import ru.kolkhoz.ui.theme.KolhozColors
 import ru.kolkhoz.ui.theme.KolhozSpacing
-import ru.kolkhoz.ui.theme.KolhozTheme
+import ru.kolkhoz.ui.theme.KolkhozTheme
 import ru.kolkhoz.ui.theme.KolhozTypography
 
 /**
@@ -58,7 +58,7 @@ fun CurrentPlayerCard(
 @Preview(showBackground = true, backgroundColor = 0xFF08110F)
 @Composable
 private fun CurrentPlayerCardPreview() {
-    KolhozTheme {
+    KolkhozTheme {
         CurrentPlayerCard(playerName = "САША", score = 7, series = 4)
     }
 }

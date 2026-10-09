@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import ru.kolkhoz.ui.theme.KolhozColors
 import ru.kolkhoz.ui.theme.KolhozRadius
 import ru.kolkhoz.ui.theme.KolhozSpacing
-import ru.kolkhoz.ui.theme.KolhozTheme
+import ru.kolkhoz.ui.theme.KolkhozTheme
 import ru.kolkhoz.ui.theme.KolhozTypography
 
 /** Игрок в карточке партии: имя и счёт. */
@@ -80,7 +80,7 @@ fun GameHistoryCard(
 @Preview(showBackground = true, backgroundColor = 0xFF08110F)
 @Composable
 private fun GameHistoryCardPreview() {
-    KolhozTheme {
+    KolkhozTheme {
         GameHistoryCard(
             date = "7 октября, 21:10",
             players = listOf(

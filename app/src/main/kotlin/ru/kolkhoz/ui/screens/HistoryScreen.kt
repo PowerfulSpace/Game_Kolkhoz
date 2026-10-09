@@ -112,6 +112,7 @@ fun HistoryScreen(
 }
 
 /** Ячейка заголовка таблицы; вызывается только внутри [Row]. */
+@Composable
 private fun RowScope.HistoryTableHeaderCell(text: String, weight: Float) {
     Text(
         text = text,

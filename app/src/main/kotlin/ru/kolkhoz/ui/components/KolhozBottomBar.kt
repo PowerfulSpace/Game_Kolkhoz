@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalIndication
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -24,7 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.kolkhoz.ui.theme.KolhozColors
 import ru.kolkhoz.ui.theme.KolhozSpacing
-import ru.kolkhoz.ui.theme.KolhozTheme
+import ru.kolkhoz.ui.theme.KolkhozTheme
 import ru.kolkhoz.ui.theme.KolhozTypography
 
 /**
@@ -92,7 +91,7 @@ private fun BottomBarAction(
             .defaultMinSize(minHeight = 48.dp)
             .clickable(
                 interactionSource = interactionSource,
-                indication = LocalIndication.current,
+                indication = null,
                 enabled = enabled,
                 role = Role.Button,
                 onClick = onClick,
@@ -119,7 +118,7 @@ private fun BottomBarAction(
 @Preview(showBackground = true, backgroundColor = 0xFF08110F)
 @Composable
 private fun KolhozBottomBarPreview() {
-    KolhozTheme {
+    KolkhozTheme {
         KolhozBottomBar(onUndoClick = {}, onHistoryClick = {})
     }
 }
