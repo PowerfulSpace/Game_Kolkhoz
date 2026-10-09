@@ -126,7 +126,12 @@ fun NewGameScreen(
                         playerNumber = i + 1,
                         onDelete = { onDeletePlayer(i) },
                         maxLength = 32,
-                        errorText = uiState.nameErrors.getOrNull(i),
+                        // Inline-ошибки — только после «НАЧАТЬ ИГРУ».
+                        errorText = if (uiState.wasSubmitted) {
+                            uiState.nameErrors.getOrNull(i)
+                        } else {
+                            null
+                        },
                     )
                 }
             }
@@ -136,7 +141,9 @@ fun NewGameScreen(
             KolhozButton(
                 text = "НАЧАТЬ ИГРУ",
                 onClick = onStartGame,
-                enabled = uiState.canStartGame && !uiState.isSaving,
+                // Кнопка активна всегда: тап = валидация имён
+                // (wasSubmitted), блокируется только на время сохранения.
+                enabled = !uiState.isSaving,
                 modifier = Modifier.fillMaxWidth(),
             )
         }

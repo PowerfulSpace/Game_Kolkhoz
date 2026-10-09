@@ -22,11 +22,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import kotlinx.coroutines.launch
 import ru.kolkhoz.domain.model.GameId
+import ru.kolkhoz.ui.screens.GameHistoryScreen
 import ru.kolkhoz.ui.screens.GameScreen
 import ru.kolkhoz.ui.screens.HistoryScreen
 import ru.kolkhoz.ui.screens.HomeScreen
 import ru.kolkhoz.ui.screens.NewGameScreen
 import ru.kolkhoz.ui.screens.ResultScreen
+import ru.kolkhoz.ui.viewmodel.GameHistoryViewModel
 import ru.kolkhoz.ui.viewmodel.GameViewModel
 import ru.kolkhoz.ui.viewmodel.HomeViewModel
 import ru.kolkhoz.ui.viewmodel.NewGameViewModel
@@ -52,6 +54,9 @@ object Routes {
     /** История ударов текущей партии. */
     const val HISTORY = "history"
 
+    /** История игр — список сыгранных партий. */
+    const val GAME_HISTORY = "game_history"
+
     /** Итоги партии; аргумент `gameId`. */
     const val RESULT = "result/{gameId}"
 
@@ -60,14 +65,16 @@ object Routes {
 }
 
 /**
- * Граф навигации приложения: 5 экранов, один `NavHost`
+ * Граф навигации приложения: 6 экранов, один `NavHost`
  * (UI_SPEC.md, раздел 1.1).
  *
- * - HOME → NEW_GAME / GAME / HISTORY.
+ * - HOME → NEW_GAME / GAME / GAME_HISTORY.
  * - NEW_GAME → GAME (после «НАЧАТЬ ИГРУ»; NEW_GAME убирается
  *   из back-stack, вернуться нельзя — UI_SPEC 7.3).
  * - GAME → HISTORY / RESULT (после завершения; GAME убирается
  *   из back-stack — UI_SPEC 7.3).
+ * - GAME_HISTORY → RESULT (тап по карточке) / NEW_GAME (пустое
+ *   состояние).
  * - HISTORY → назад (popBackStack).
  * - RESULT → NEW_GAME / HOME (back-stack очищается — UI_SPEC 7.3).
  *
@@ -92,7 +99,7 @@ fun KolkhozNavHost(
                 uiState = uiState,
                 onNewGame = { navController.navigate(Routes.NEW_GAME) },
                 onContinueGame = { navController.navigate(Routes.GAME) },
-                onHistory = { navController.navigate(Routes.HISTORY) },
+                onHistory = { navController.navigate(Routes.GAME_HISTORY) },
                 onErrorShown = viewModel::clearError,
             )
         }
@@ -162,6 +169,23 @@ fun KolkhozNavHost(
                     }
                 },
                 onBack = { navController.popBackStack() },
+                onErrorShown = viewModel::clearError,
+            )
+        }
+
+        composable(Routes.GAME_HISTORY) {
+            LockPortrait()
+            val viewModel: GameHistoryViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            GameHistoryScreen(
+                uiState = uiState,
+                onBack = { navController.popBackStack() },
+                onGameClick = { gameId ->
+                    navController.navigate(Routes.result(gameId))
+                },
+                onNewGame = {
+                    navController.navigate(Routes.NEW_GAME)
+                },
                 onErrorShown = viewModel::clearError,
             )
         }

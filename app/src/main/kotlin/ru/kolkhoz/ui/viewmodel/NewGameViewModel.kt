@@ -112,6 +112,9 @@ class NewGameViewModel @Inject constructor(
      * Создаёт партию: [GameRules.createGame] → сохранение в
      * репозиторий → [onSuccess] с id партии.
      *
+     * Если имена ещё невалидны — только показывает inline-ошибки
+     * (`wasSubmitted = true`), без создания.
+     *
      * При ошибке валидации или сохранения — человекочитаемое
      * сообщение в `errorMessage`.
      *
@@ -119,6 +122,10 @@ class NewGameViewModel @Inject constructor(
      */
     fun onStartGame(onSuccess: (GameId) -> Unit) {
         if (isSaving) return
+        if (!_uiState.value.canStartGame) {
+            _uiState.update { it.copy(wasSubmitted = true) }
+            return
+        }
         val names = _uiState.value.playerNames
         val players = names.mapIndexed { index, name ->
             Player(

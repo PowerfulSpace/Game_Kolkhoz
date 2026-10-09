@@ -15,6 +15,8 @@ package ru.kolkhoz.ui.model
  * @property isSaving Идёт ли сохранение новой партии; пока
  *   `true` — кнопка «НАЧАТЬ ИГРУ» заблокирована
  *   (защита от дабл-тапа).
+ * @property wasSubmitted Была ли попытка «НАЧАТЬ ИГРУ»; пока
+ *   `false` — inline-ошибки имён не показываются.
  * @property errorMessage Человеческое сообщение об ошибке
  *   создания; `null` — ошибки нет.
  */
@@ -24,5 +26,6 @@ data class NewGameUiState(
     val canStartGame: Boolean = false,
     val nameErrors: List<String?> = List(4) { null },
     val isSaving: Boolean = false,
+    val wasSubmitted: Boolean = false,
     val errorMessage: String? = null,
 )
