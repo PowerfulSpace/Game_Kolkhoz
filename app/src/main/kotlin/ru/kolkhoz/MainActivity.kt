@@ -33,7 +33,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.Theme_Kolkhoz)
         super.onCreate(savedInstanceState)
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        // PORTRAIT только при холодном старте (UI_SPEC.md 1.2).
+        // При повороте (savedInstanceState != null) НЕ ставим
+        // принудительно — иначе Game/History не смогут повернуться
+        // (recreate вызовет onCreate снова и заблокирует landscape).
+        // Статические экраны (Home, NewGame, Result, GameHistory)
+        // лочатся своим LockPortrait в KolkhozNavHost.
+        if (savedInstanceState == null) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
         setContent {
             KolkhozTheme {
                 Surface(

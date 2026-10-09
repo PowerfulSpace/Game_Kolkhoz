@@ -8,10 +8,15 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,6 +45,7 @@ import ru.kolkhoz.ui.theme.KolhozTypography
  * @param text Текст кнопки.
  * @param onClick Колбэк нажатия.
  * @param enabled Активна ли кнопка.
+ * @param leadingIcon Необязательная иконка слева от текста.
  * @param modifier Модификатор.
  */
 @Composable
@@ -47,6 +54,7 @@ fun KolhozSecondaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    leadingIcon: ImageVector? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
@@ -78,11 +86,25 @@ fun KolhozSecondaryButton(
             .padding(horizontal = KolhozSpacing.XXL),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = text,
-            style = KolhozTypography.ButtonSecondary,
-            color = KolhozColors.TextPrimary,
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            if (leadingIcon != null) {
+                Icon(
+                    imageVector = leadingIcon,
+                    contentDescription = null,
+                    tint = KolhozColors.TextPrimary,
+                    modifier = Modifier.size(24.dp),
+                )
+                Spacer(Modifier.width(KolhozSpacing.M))
+            }
+            Text(
+                text = text,
+                style = KolhozTypography.ButtonSecondary,
+                color = KolhozColors.TextPrimary,
+            )
+        }
     }
 }
 

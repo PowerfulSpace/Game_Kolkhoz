@@ -4,10 +4,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -22,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import ru.kolkhoz.R
 import ru.kolkhoz.ui.components.KolhozButton
 import ru.kolkhoz.ui.components.KolhozSecondaryButton
-import ru.kolkhoz.ui.components.KolhozTextButton
+import ru.kolkhoz.ui.components.KolkhozIcons
 import ru.kolkhoz.ui.model.HomeUiState
 import ru.kolkhoz.ui.theme.KolhozColors
 import ru.kolkhoz.ui.theme.KolhozSpacing
@@ -81,14 +83,13 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(KolhozSpacing.L),
+                .padding(horizontal = KolhozSpacing.XXL),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Логотип + подписи — один плотный блок.
+            // Логотип + подписи — один плотный блок по центру.
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(KolhozSpacing.S),
             ) {
                 Image(
                     painter = painterResource(R.drawable.logo_kolkhoz),
@@ -96,11 +97,13 @@ fun HomeScreen(
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxWidth(0.8f),
                 )
+                Spacer(Modifier.height(KolhozSpacing.L))
                 Text(
                     text = "БИЛЬЯРДНЫЙ СЧЁТЧИК",
                     style = KolhozTypography.Body,
                     color = KolhozColors.TextSecondary,
                 )
+                Spacer(Modifier.height(KolhozSpacing.S))
                 Text(
                     text = "Считаем, чтобы не сраться",
                     style = KolhozTypography.Caption,
@@ -108,27 +111,33 @@ fun HomeScreen(
                 )
             }
 
-            // Между крупными секциями — 24dp.
+            // Отступ от слогана до первой кнопки — 40dp.
+            Spacer(Modifier.height(KolhozSpacing.XXXXL))
+
+            // Между кнопками — 16dp.
             Column(
-                verticalArrangement = Arrangement.spacedBy(KolhozSpacing.XXL),
+                verticalArrangement = Arrangement.spacedBy(KolhozSpacing.L),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 KolhozButton(
                     text = "НОВАЯ ИГРА",
                     onClick = onNewGame,
                     modifier = Modifier.fillMaxWidth(),
+                    leadingIcon = KolkhozIcons.NewGame,
                 )
                 if (uiState.hasActiveGame) {
                     KolhozSecondaryButton(
                         text = "ПРОДОЛЖИТЬ ИГРУ",
                         onClick = onContinueGame,
                         modifier = Modifier.fillMaxWidth(),
+                        leadingIcon = KolkhozIcons.Continue,
                     )
                 }
-                KolhozTextButton(
+                KolhozSecondaryButton(
                     text = "ИСТОРИЯ ИГР",
                     onClick = onHistory,
                     modifier = Modifier.fillMaxWidth(),
+                    leadingIcon = KolkhozIcons.History,
                 )
             }
         }
