@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -83,65 +85,70 @@ fun HomeScreen(
         )
 
         CenteredContent {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = KolhozSpacing.XXL),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
             ) {
-                // Логотип + подписи — один плотный блок по центру.
                 Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = KolhozSpacing.XXL),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.logo_kolkhoz),
-                        contentDescription = "КОЛХОЗ",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.fillMaxWidth(0.8f),
-                    )
-                    Spacer(Modifier.height(KolhozSpacing.L))
-                    Text(
-                        text = "БИЛЬЯРДНЫЙ СЧЁТЧИК",
-                        style = KolhozTypography.Body,
-                        color = KolhozColors.TextSecondary,
-                    )
-                    Spacer(Modifier.height(KolhozSpacing.S))
-                    Text(
-                        text = "Считаем, чтобы не сраться",
-                        style = KolhozTypography.Caption,
-                        color = KolhozColors.TextSecondary,
-                    )
-                }
-
-                // Отступ от слогана до первой кнопки — 40dp.
-                Spacer(Modifier.height(KolhozSpacing.XXXXL))
-
-                // Между кнопками — 16dp.
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(KolhozSpacing.L),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    KolhozButton(
-                        text = "НОВАЯ ИГРА",
-                        onClick = onNewGame,
-                        modifier = Modifier.fillMaxWidth(),
-                        leadingIcon = KolkhozIcons.NewGame,
-                    )
-                    if (uiState.hasActiveGame) {
-                        KolhozSecondaryButton(
-                            text = "ПРОДОЛЖИТЬ ИГРУ",
-                            onClick = onContinueGame,
-                            modifier = Modifier.fillMaxWidth(),
-                            leadingIcon = KolkhozIcons.Continue,
+                    // Логотип + подписи — один плотный блок по центру.
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.logo_kolkhoz),
+                            contentDescription = "КОЛХОЗ",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxWidth(0.8f),
+                        )
+                        Spacer(Modifier.height(KolhozSpacing.L))
+                        Text(
+                            text = "БИЛЬЯРДНЫЙ СЧЁТЧИК",
+                            style = KolhozTypography.Body,
+                            color = KolhozColors.TextSecondary,
+                        )
+                        Spacer(Modifier.height(KolhozSpacing.S))
+                        Text(
+                            text = "Считаем, чтобы не сраться",
+                            style = KolhozTypography.Caption,
+                            color = KolhozColors.TextSecondary,
                         )
                     }
-                    KolhozSecondaryButton(
-                        text = "ИСТОРИЯ ИГР",
-                        onClick = onHistory,
-                        modifier = Modifier.fillMaxWidth(),
-                        leadingIcon = KolkhozIcons.History,
-                    )
+
+                    // Отступ от слогана до первой кнопки — 40dp.
+                    Spacer(Modifier.height(KolhozSpacing.XXXXL))
+
+                    // Между кнопками — 16dp.
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(KolhozSpacing.L),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        KolhozButton(
+                            text = "НОВАЯ ИГРА",
+                            onClick = onNewGame,
+                            modifier = Modifier.fillMaxWidth(),
+                            leadingIcon = KolkhozIcons.NewGame,
+                        )
+                        if (uiState.hasActiveGame) {
+                            KolhozSecondaryButton(
+                                text = "ПРОДОЛЖИТЬ ИГРУ",
+                                onClick = onContinueGame,
+                                modifier = Modifier.fillMaxWidth(),
+                                leadingIcon = KolkhozIcons.Continue,
+                            )
+                        }
+                        KolhozSecondaryButton(
+                            text = "ИСТОРИЯ ИГР",
+                            onClick = onHistory,
+                            modifier = Modifier.fillMaxWidth(),
+                            leadingIcon = KolkhozIcons.History,
+                        )
+                    }
                 }
             }
         }
