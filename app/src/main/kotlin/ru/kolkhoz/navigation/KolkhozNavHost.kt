@@ -1,17 +1,11 @@
 package ru.kolkhoz.navigation
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
-import android.content.pm.ActivityInfo
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -92,7 +86,6 @@ fun KolkhozNavHost(
         startDestination = Routes.HOME,
     ) {
         composable(Routes.HOME) {
-            LockPortrait()
             val viewModel: HomeViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             HomeScreen(
@@ -105,7 +98,6 @@ fun KolkhozNavHost(
         }
 
         composable(Routes.NEW_GAME) {
-            LockPortrait()
             val viewModel: NewGameViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             var showActiveGameDialog by remember { mutableStateOf(false) }
@@ -174,7 +166,6 @@ fun KolkhozNavHost(
         }
 
         composable(Routes.GAME_HISTORY) {
-            LockPortrait()
             val viewModel: GameHistoryViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             GameHistoryScreen(
@@ -207,7 +198,6 @@ fun KolkhozNavHost(
                 navArgument("gameId") { type = NavType.StringType },
             ),
         ) {
-            LockPortrait()
             val viewModel: ResultViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             ResultScreen(
@@ -226,36 +216,4 @@ fun KolkhozNavHost(
             )
         }
     }
-}
-
-/**
- * Блокирует ориентацию экрана в portrait на время жизни
- * composable (UI_SPEC.md 1.2: Home, NewGame, Result — только
- * portrait; Game и History работают в обеих ориентациях).
- *
- * При выходе ориентация снимается в UNSPECIFIED — сенсор
- * сам решает (в т.ч. в landscape). Восстанавливать «что было»
- * нельзя: MainActivity стартует с PORTRAIT, и возврат к нему
- * навсегда запер бы Game/History в portrait.
- */
-@Composable
-private fun LockPortrait() {
-    val context = LocalContext.current
-    DisposableEffect(Unit) {
-        val activity = context.findActivity()
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        onDispose {
-            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-        }
-    }
-}
-
-/** Находит Activity из контекста Compose (обход ContextWrapper). */
-private fun Context.findActivity(): Activity? {
-    var ctx: Context = this
-    while (ctx is ContextWrapper) {
-        if (ctx is Activity) return ctx
-        ctx = ctx.baseContext
-    }
-    return null
 }

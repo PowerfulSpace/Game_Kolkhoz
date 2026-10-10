@@ -22,6 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import ru.kolkhoz.R
+import ru.kolkhoz.ui.components.CenteredContent
 import ru.kolkhoz.ui.components.KolhozButton
 import ru.kolkhoz.ui.components.KolhozSecondaryButton
 import ru.kolkhoz.ui.components.KolkhozIcons
@@ -68,6 +69,7 @@ fun HomeScreen(
     // до первого emission активной партии нет — кнопка скрыта.
     Box(modifier = modifier.fillMaxSize()) {
         // Фон: фото стола в нижних 40% экрана, приглушённое.
+        // Снаружи CenteredContent — на всю ширину (в т.ч. landscape).
         Image(
             painter = painterResource(R.drawable.home_background),
             contentDescription = null,
@@ -80,65 +82,67 @@ fun HomeScreen(
                 .fillMaxHeight(0.4f),
         )
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = KolhozSpacing.XXL),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            // Логотип + подписи — один плотный блок по центру.
+        CenteredContent {
             Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = KolhozSpacing.XXL),
+                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Image(
-                    painter = painterResource(R.drawable.logo_kolkhoz),
-                    contentDescription = "КОЛХОЗ",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.fillMaxWidth(0.8f),
-                )
-                Spacer(Modifier.height(KolhozSpacing.L))
-                Text(
-                    text = "БИЛЬЯРДНЫЙ СЧЁТЧИК",
-                    style = KolhozTypography.Body,
-                    color = KolhozColors.TextSecondary,
-                )
-                Spacer(Modifier.height(KolhozSpacing.S))
-                Text(
-                    text = "Считаем, чтобы не сраться",
-                    style = KolhozTypography.Caption,
-                    color = KolhozColors.TextSecondary,
-                )
-            }
-
-            // Отступ от слогана до первой кнопки — 40dp.
-            Spacer(Modifier.height(KolhozSpacing.XXXXL))
-
-            // Между кнопками — 16dp.
-            Column(
-                verticalArrangement = Arrangement.spacedBy(KolhozSpacing.L),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                KolhozButton(
-                    text = "НОВАЯ ИГРА",
-                    onClick = onNewGame,
-                    modifier = Modifier.fillMaxWidth(),
-                    leadingIcon = KolkhozIcons.NewGame,
-                )
-                if (uiState.hasActiveGame) {
-                    KolhozSecondaryButton(
-                        text = "ПРОДОЛЖИТЬ ИГРУ",
-                        onClick = onContinueGame,
-                        modifier = Modifier.fillMaxWidth(),
-                        leadingIcon = KolkhozIcons.Continue,
+                // Логотип + подписи — один плотный блок по центру.
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.logo_kolkhoz),
+                        contentDescription = "КОЛХОЗ",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxWidth(0.8f),
+                    )
+                    Spacer(Modifier.height(KolhozSpacing.L))
+                    Text(
+                        text = "БИЛЬЯРДНЫЙ СЧЁТЧИК",
+                        style = KolhozTypography.Body,
+                        color = KolhozColors.TextSecondary,
+                    )
+                    Spacer(Modifier.height(KolhozSpacing.S))
+                    Text(
+                        text = "Считаем, чтобы не сраться",
+                        style = KolhozTypography.Caption,
+                        color = KolhozColors.TextSecondary,
                     )
                 }
-                KolhozSecondaryButton(
-                    text = "ИСТОРИЯ ИГР",
-                    onClick = onHistory,
-                    modifier = Modifier.fillMaxWidth(),
-                    leadingIcon = KolkhozIcons.History,
-                )
+
+                // Отступ от слогана до первой кнопки — 40dp.
+                Spacer(Modifier.height(KolhozSpacing.XXXXL))
+
+                // Между кнопками — 16dp.
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(KolhozSpacing.L),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    KolhozButton(
+                        text = "НОВАЯ ИГРА",
+                        onClick = onNewGame,
+                        modifier = Modifier.fillMaxWidth(),
+                        leadingIcon = KolkhozIcons.NewGame,
+                    )
+                    if (uiState.hasActiveGame) {
+                        KolhozSecondaryButton(
+                            text = "ПРОДОЛЖИТЬ ИГРУ",
+                            onClick = onContinueGame,
+                            modifier = Modifier.fillMaxWidth(),
+                            leadingIcon = KolkhozIcons.Continue,
+                        )
+                    }
+                    KolhozSecondaryButton(
+                        text = "ИСТОРИЯ ИГР",
+                        onClick = onHistory,
+                        modifier = Modifier.fillMaxWidth(),
+                        leadingIcon = KolkhozIcons.History,
+                    )
+                }
             }
         }
 

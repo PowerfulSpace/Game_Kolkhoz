@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import ru.kolkhoz.ui.components.CenteredContent
 import ru.kolkhoz.ui.components.GameHistoryCard
 import ru.kolkhoz.ui.components.KolhozButton
 import ru.kolkhoz.ui.components.KolhozTopBar
@@ -68,55 +69,57 @@ fun GameHistoryScreen(
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            KolhozTopBar(title = "ИСТОРИЯ ИГР", onBackClick = onBack)
+        CenteredContent {
+            Column(modifier = Modifier.fillMaxSize()) {
+                KolhozTopBar(title = "ИСТОРИЯ ИГР", onBackClick = onBack)
 
-            if (uiState.isEmpty) {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .padding(KolhozSpacing.L),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    Text(
-                        text = "Пока нет сыгранных партий.",
-                        style = KolhozTypography.H2,
-                        color = KolhozColors.TextPrimary,
-                    )
-                    Spacer(modifier = Modifier.height(KolhozSpacing.M))
-                    Text(
-                        text = "Создайте первую игру, чтобы она появилась здесь.",
-                        style = KolhozTypography.Body,
-                        color = KolhozColors.TextSecondary,
-                    )
-                    Spacer(modifier = Modifier.height(KolhozSpacing.XXL))
-                    KolhozButton(
-                        text = "НОВАЯ ИГРА",
-                        onClick = onNewGame,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    contentPadding = PaddingValues(KolhozSpacing.L),
-                    verticalArrangement = Arrangement.spacedBy(KolhozSpacing.M),
-                ) {
-                    items(uiState.games, key = { it.gameId }) { game ->
-                        GameHistoryCard(
-                            date = game.date,
-                            players = game.players.map {
-                                PlayerScore(name = it.name, score = it.score)
-                            },
-                            shotCount = game.shotsCount,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onGameClick(game.gameId) },
+                if (uiState.isEmpty) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .padding(KolhozSpacing.L),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Text(
+                            text = "Пока нет сыгранных партий.",
+                            style = KolhozTypography.H2,
+                            color = KolhozColors.TextPrimary,
                         )
+                        Spacer(modifier = Modifier.height(KolhozSpacing.M))
+                        Text(
+                            text = "Создайте первую игру, чтобы она появилась здесь.",
+                            style = KolhozTypography.Body,
+                            color = KolhozColors.TextSecondary,
+                        )
+                        Spacer(modifier = Modifier.height(KolhozSpacing.XXL))
+                        KolhozButton(
+                            text = "НОВАЯ ИГРА",
+                            onClick = onNewGame,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentPadding = PaddingValues(KolhozSpacing.L),
+                        verticalArrangement = Arrangement.spacedBy(KolhozSpacing.M),
+                    ) {
+                        items(uiState.games, key = { it.gameId }) { game ->
+                            GameHistoryCard(
+                                date = game.date,
+                                players = game.players.map {
+                                    PlayerScore(name = it.name, score = it.score)
+                                },
+                                shotCount = game.shotsCount,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onGameClick(game.gameId) },
+                            )
+                        }
                     }
                 }
             }

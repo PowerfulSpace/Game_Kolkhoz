@@ -47,18 +47,23 @@ text
 
 ### 1.2. Ориентация
 
+Все экраны поддерживают portrait и landscape.
+
 | Экран | Portrait | Landscape |
 |-------|----------|-----------|
-| HomeScreen | ✅ | ❌ (только portrait) |
-| NewGameScreen | ✅ | ❌ |
-| GameScreen | ✅ | ✅ |
-| HistoryScreen | ✅ | ✅ |
-| ResultScreen | ✅ | ❌ |
+| HomeScreen | ✅ | ✅ (контент центрирован) |
+| NewGameScreen | ✅ | ✅ (контент центрирован) |
+| GameScreen | ✅ | ✅ (3-колоночный layout) |
+| HistoryScreen | ✅ | ✅ (таблица) |
+| ResultScreen | ✅ | ✅ (контент центрирован) |
+| GameHistoryScreen | ✅ | ✅ (контент центрирован) |
 
-**Технически:** `MainActivity` — `screenOrientation="unspecified"`. 
-Для `HomeScreen`, `NewGameScreen`, `ResultScreen` — **программно** 
-блокируем portrait. Для `GameScreen` и `HistoryScreen` — 
-разрешаем обе.
+**Технически:** `MainActivity` — unspecified; при холодном старте
+программно запрашиваем portrait (UI_SPEC 1.2, `onCreate`).
+Home, NewGame, Result, GameHistory: в landscape контент
+центрируется (`CenteredContent`, maxWidth 480dp), по бокам
+тёмные поля. Game и History: landscape — 3-колоночный
+layout / таблица.
 
 ### 1.3. Общие состояния
 

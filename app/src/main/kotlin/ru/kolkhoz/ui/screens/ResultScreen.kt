@@ -32,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.kolkhoz.R
+import ru.kolkhoz.ui.components.CenteredContent
 import ru.kolkhoz.ui.components.KolkhozIcons
 import ru.kolkhoz.ui.components.KolhozButton
 import ru.kolkhoz.ui.components.KolhozSecondaryButton
@@ -89,70 +90,71 @@ fun ResultScreen(
         return
     }
 
-    // Партия не найдена — без пустого «ИГРА ОКОНЧЕНА».
-    if (uiState.players.isEmpty()) {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(KolhozSpacing.L),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                text = "Партия не найдена",
-                style = KolhozTypography.H2,
-                color = KolhozColors.TextPrimary,
-            )
-            Spacer(modifier = Modifier.height(KolhozSpacing.XXL))
-            KolhozSecondaryButton(
-                text = "НА ГЛАВНУЮ",
-                onClick = onHome,
-            )
-        }
-        return
-    }
-
     Box(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(KolhozSpacing.L),
-            verticalArrangement = Arrangement.spacedBy(KolhozSpacing.L),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Image(
-                painter = painterResource(R.drawable.trophy),
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.width(200.dp),
-            )
+        CenteredContent {
+            // Партия не найдена — без пустого «ИГРА ОКОНЧЕНА».
+            if (uiState.players.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(KolhozSpacing.L),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    Text(
+                        text = "Партия не найдена",
+                        style = KolhozTypography.H2,
+                        color = KolhozColors.TextPrimary,
+                    )
+                    Spacer(modifier = Modifier.height(KolhozSpacing.XXL))
+                    KolhozSecondaryButton(
+                        text = "НА ГЛАВНУЮ",
+                        onClick = onHome,
+                    )
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(KolhozSpacing.L),
+                    verticalArrangement = Arrangement.spacedBy(KolhozSpacing.L),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.trophy),
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.width(200.dp),
+                    )
 
-            Text(
-                text = "ИГРА ОКОНЧЕНА",
-                style = KolhozTypography.H1,
-                color = KolhozColors.TextPrimary,
-            )
+                    Text(
+                        text = "ИГРА ОКОНЧЕНА",
+                        style = KolhozTypography.H1,
+                        color = KolhozColors.TextPrimary,
+                    )
 
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(KolhozSpacing.S),
-            ) {
-                uiState.players.forEach { player ->
-                    ResultRow(player = player)
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(KolhozSpacing.S),
+                    ) {
+                        uiState.players.forEach { player ->
+                            ResultRow(player = player)
+                        }
+                    }
+
+                    KolhozButton(
+                        text = "НОВАЯ ИГРА",
+                        onClick = onNewGame,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    KolhozSecondaryButton(
+                        text = "НА ГЛАВНУЮ",
+                        onClick = onHome,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
             }
-
-            KolhozButton(
-                text = "НОВАЯ ИГРА",
-                onClick = onNewGame,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            KolhozSecondaryButton(
-                text = "НА ГЛАВНУЮ",
-                onClick = onHome,
-                modifier = Modifier.fillMaxWidth(),
-            )
         }
 
         SnackbarHost(

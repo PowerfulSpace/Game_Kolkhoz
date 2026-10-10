@@ -7,12 +7,9 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -84,23 +81,21 @@ fun KolhozButton(
             .padding(horizontal = KolhozSpacing.XXL),
         contentAlignment = Alignment.Center,
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            if (leadingIcon != null) {
-                Icon(
-                    imageVector = leadingIcon,
-                    contentDescription = null,
-                    tint = textColor,
-                    modifier = Modifier.size(24.dp),
-                )
-                Spacer(Modifier.width(KolhozSpacing.M))
-            }
-            Text(
-                text = text,
-                style = KolhozTypography.Button,
-                color = textColor,
+        // Текст — по центру кнопки.
+        Text(
+            text = text,
+            style = KolhozTypography.Button,
+            color = textColor,
+        )
+        // Иконка — слева от центра, если есть.
+        if (leadingIcon != null) {
+            Icon(
+                imageVector = leadingIcon,
+                contentDescription = null,
+                tint = textColor,
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .size(24.dp),
             )
         }
     }
