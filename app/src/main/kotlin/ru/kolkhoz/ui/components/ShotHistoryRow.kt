@@ -64,20 +64,21 @@ fun ShotHistoryRow(
                 color = KolhozColors.TextPrimary,
                 modifier = Modifier.weight(1f),
             )
-            Icon(
-                imageVector = if (isPocketed) {
-                    KolkhozIcons.Pocket
-                } else {
-                    KolkhozIcons.Miss
-                },
-                contentDescription = null,
-                tint = if (isPocketed) {
-                    KolhozColors.Positive
-                } else {
-                    KolhozColors.Negative
-                },
-                modifier = Modifier.size(if (isPocketed) 8.dp else 12.dp),
-            )
+            if (isPocketed) {
+                Icon(
+                    painter = KolkhozIcons.Pocket,
+                    contentDescription = null,
+                    tint = KolhozColors.Positive,
+                    modifier = Modifier.size(8.dp),
+                )
+            } else {
+                Icon(
+                    imageVector = KolkhozIcons.Close,
+                    contentDescription = null,
+                    tint = KolhozColors.Negative,
+                    modifier = Modifier.size(12.dp),
+                )
+            }
             Text(
                 text = if (isPocketed) "ЗАБИЛ" else "ПРОМАХ",
                 style = KolhozTypography.BodyMedium,

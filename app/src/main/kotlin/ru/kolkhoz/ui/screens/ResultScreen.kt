@@ -36,6 +36,7 @@ import ru.kolkhoz.ui.components.CenteredContent
 import ru.kolkhoz.ui.components.KolkhozIcons
 import ru.kolkhoz.ui.components.KolhozButton
 import ru.kolkhoz.ui.components.KolhozSecondaryButton
+import ru.kolkhoz.ui.components.KolhozTopBar
 import ru.kolkhoz.ui.components.ScoreText
 import ru.kolkhoz.ui.components.rowScoreStyle
 import ru.kolkhoz.ui.model.PlayerResultUi
@@ -91,68 +92,74 @@ fun ResultScreen(
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        CenteredContent {
-            // Партия не найдена — без пустого «ИГРА ОКОНЧЕНА».
-            if (uiState.players.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(KolhozSpacing.L),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    Text(
-                        text = "Партия не найдена",
-                        style = KolhozTypography.H2,
-                        color = KolhozColors.TextPrimary,
-                    )
-                    Spacer(modifier = Modifier.height(KolhozSpacing.XXL))
-                    KolhozSecondaryButton(
-                        text = "НА ГЛАВНУЮ",
-                        onClick = onHome,
-                    )
-                }
-            } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(KolhozSpacing.L),
-                    verticalArrangement = Arrangement.spacedBy(KolhozSpacing.L),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.trophy),
-                        contentDescription = null,
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.width(200.dp),
-                    )
+        Column(modifier = Modifier.fillMaxSize()) {
+            KolhozTopBar(title = "ИТОГИ ИГРЫ", onBackClick = onHome)
 
-                    Text(
-                        text = "ИГРА ОКОНЧЕНА",
-                        style = KolhozTypography.H1,
-                        color = KolhozColors.TextPrimary,
-                    )
-
+            CenteredContent(modifier = Modifier.weight(1f)) {
+                // Партия не найдена — без пустого «ИГРА ОКОНЧЕНА».
+                if (uiState.players.isEmpty()) {
                     Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(KolhozSpacing.S),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(KolhozSpacing.L),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
                     ) {
-                        uiState.players.forEach { player ->
-                            ResultRow(player = player)
-                        }
+                        Text(
+                            text = "Партия не найдена",
+                            style = KolhozTypography.H2,
+                            color = KolhozColors.TextPrimary,
+                        )
+                        Spacer(modifier = Modifier.height(KolhozSpacing.XXL))
+                        KolhozSecondaryButton(
+                            text = "НА ГЛАВНУЮ",
+                            onClick = onHome,
+                        )
                     }
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(KolhozSpacing.L),
+                        verticalArrangement = Arrangement.spacedBy(KolhozSpacing.L),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.trophy_green),
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.width(200.dp),
+                        )
 
-                    KolhozButton(
-                        text = "НОВАЯ ИГРА",
-                        onClick = onNewGame,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    KolhozSecondaryButton(
-                        text = "НА ГЛАВНУЮ",
-                        onClick = onHome,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                        Text(
+                            text = "ИГРА ОКОНЧЕНА",
+                            style = KolhozTypography.H1,
+                            color = KolhozColors.TextPrimary,
+                        )
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(KolhozSpacing.S),
+                        ) {
+                            uiState.players.forEach { player ->
+                                ResultRow(player = player)
+                            }
+                        }
+
+                        KolhozButton(
+                            text = "НОВАЯ ИГРА",
+                            onClick = onNewGame,
+                            modifier = Modifier.fillMaxWidth(),
+                            leadingPainter = KolkhozIcons.Refresh,
+                        )
+                        KolhozSecondaryButton(
+                            text = "НА ГЛАВНУЮ",
+                            onClick = onHome,
+                            modifier = Modifier.fillMaxWidth(),
+                            leadingPainter = KolkhozIcons.Home,
+                        )
+                    }
                 }
             }
         }
@@ -191,7 +198,7 @@ private fun ResultRow(player: PlayerResultUi) {
     ) {
         if (isWinner) {
             Icon(
-                imageVector = KolkhozIcons.Crown,
+                painter = KolkhozIcons.Crown,
                 contentDescription = "Победитель",
                 tint = KolhozColors.Warning,
                 modifier = Modifier.width(24.dp),

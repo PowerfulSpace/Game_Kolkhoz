@@ -153,20 +153,21 @@ private fun HistoryTableRow(event: ShotUi) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.weight(0.2f),
         ) {
-            Icon(
-                imageVector = if (event.isPocket) {
-                    KolkhozIcons.Pocket
-                } else {
-                    KolkhozIcons.Miss
-                },
-                contentDescription = null,
-                tint = if (event.isPocket) {
-                    KolhozColors.Positive
-                } else {
-                    KolhozColors.Negative
-                },
-                modifier = Modifier.size(if (event.isPocket) 8.dp else 12.dp),
-            )
+            if (event.isPocket) {
+                Icon(
+                    painter = KolkhozIcons.Pocket,
+                    contentDescription = null,
+                    tint = KolhozColors.Positive,
+                    modifier = Modifier.size(8.dp),
+                )
+            } else {
+                Icon(
+                    imageVector = KolkhozIcons.Close,
+                    contentDescription = null,
+                    tint = KolhozColors.Negative,
+                    modifier = Modifier.size(12.dp),
+                )
+            }
             Spacer(Modifier.width(KolhozSpacing.XS))
             Text(
                 text = if (event.isPocket) "ЗАБИЛ" else "ПРОМАХ",

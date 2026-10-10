@@ -101,7 +101,7 @@ fun HomeScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Image(
-                            painter = painterResource(R.drawable.logo_kolkhoz),
+                            painter = painterResource(R.drawable.logo_home),
                             contentDescription = "КОЛХОЗ",
                             contentScale = ContentScale.Fit,
                             modifier = Modifier.fillMaxWidth(0.8f),
@@ -146,7 +146,7 @@ fun HomeScreen(
                             text = "ИСТОРИЯ ИГР",
                             onClick = onHistory,
                             modifier = Modifier.fillMaxWidth(),
-                            leadingIcon = KolkhozIcons.History,
+                            leadingPainter = KolkhozIcons.History,
                         )
                     }
                 }

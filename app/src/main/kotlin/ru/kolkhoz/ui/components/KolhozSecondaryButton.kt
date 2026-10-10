@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +44,8 @@ import ru.kolkhoz.ui.theme.KolhozTypography
  * @param onClick Колбэк нажатия.
  * @param enabled Активна ли кнопка.
  * @param leadingIcon Необязательная иконка слева от текста.
+ * @param leadingPainter Необязательная растровая иконка (PNG)
+ *   слева от текста; альтернатива [leadingIcon].
  * @param modifier Модификатор.
  */
 @Composable
@@ -52,6 +55,7 @@ fun KolhozSecondaryButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     leadingIcon: ImageVector? = null,
+    leadingPainter: Painter? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
@@ -90,9 +94,17 @@ fun KolhozSecondaryButton(
             color = KolhozColors.TextPrimary,
         )
         // Иконка — слева от центра, если есть.
-        if (leadingIcon != null) {
-            Icon(
+        when {
+            leadingIcon != null -> Icon(
                 imageVector = leadingIcon,
+                contentDescription = null,
+                tint = KolhozColors.TextPrimary,
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .size(24.dp),
+            )
+            leadingPainter != null -> Icon(
+                painter = leadingPainter,
                 contentDescription = null,
                 tint = KolhozColors.TextPrimary,
                 modifier = Modifier

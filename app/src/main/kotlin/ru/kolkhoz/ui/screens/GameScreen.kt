@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import ru.kolkhoz.R
 import ru.kolkhoz.domain.model.GameStatus
 import ru.kolkhoz.domain.model.PlayerId
 import ru.kolkhoz.ui.components.CurrentPlayerCard
@@ -182,7 +183,7 @@ private fun GameContent(
     Column(modifier = Modifier.fillMaxSize()) {
         Box {
             KolhozTopBar(
-                title = "КОЛХОЗ",
+                logoRes = R.drawable.logo_topbar,
                 onMenuClick = { menuExpanded = true },
             )
             DropdownMenu(

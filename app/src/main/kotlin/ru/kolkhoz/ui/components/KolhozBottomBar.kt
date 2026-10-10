@@ -17,7 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,7 +55,7 @@ fun KolhozBottomBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BottomBarAction(
-            icon = KolkhozIcons.Undo,
+            icon = rememberVectorPainter(KolkhozIcons.Undo),
             label = "ОТМЕНА УДАРА",
             enabled = undoEnabled,
             onClick = onUndoClick,
@@ -73,7 +74,7 @@ fun KolhozBottomBar(
 /** Элемент нижней панели: иконка + текст, стиль text button. */
 @Composable
 private fun BottomBarAction(
-    icon: ImageVector,
+    icon: Painter,
     label: String,
     enabled: Boolean,
     onClick: () -> Unit,
@@ -101,7 +102,7 @@ private fun BottomBarAction(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = icon,
+            painter = icon,
             contentDescription = null,
             tint = contentColor,
             modifier = Modifier.size(20.dp),

@@ -397,9 +397,17 @@ text
 
 ### 10.1. Источник
 
-**Vector drawable** (`res/drawable/`). **НЕ** Unicode-символы 
-(`●`, `×`, `👑`, `🏆`) — они рендерятся по-разному на разных 
-устройствах.
+Гибрид двух типов (`KolkhozIcons`):
+
+- **Material Icons** и **vector drawable** — `ImageVector`,
+  рендерятся через `Icon(imageVector = ...)`.
+- **PNG drawable** — `Painter`, рендерятся через
+  `Icon(painter = ...)`. **НЕ** Unicode-символы
+  (`●`, `×`, `👑`, `🏆`) — они рендерятся по-разному на разных
+  устройствах.
+
+> **Важно:** `ImageVector.vectorResource()` не работает с PNG.
+> Для растровых иконок — только `painterResource()`.
 
 ### 10.2. Стиль
 
@@ -412,24 +420,42 @@ text
 
 ### 10.4. Базовый набор (MVP)
 
-| Иконка | Где | Что |
-|--------|-----|-----|
-| `ic_new_game` | Главный | + |
-| `ic_continue` | Главный | ▶ |
-| `ic_undo` | Игровой | ↶ |
-| `ic_history` | Игровой | ☰ |
-| `ic_menu` | Топ-бар | ⋮ |
-| `ic_close` | Игровой | × |
-| `ic_pocket` | История | ● (круг) |
-| `ic_miss` | История | × (крест) |
-| `ic_crown` | Игровой | корона (или кружок) |
-| `ic_trophy` | Итоги | кубок (или звезда) |
-| `ic_home` | Итоги | домик |
+**Material Icons (`ImageVector`):**
 
-**Если кастомных иконок нет** — используем **Material Icons** 
-(`Icons.Filled.Circle`, `Icons.Filled.Close`, 
-`Icons.Filled.Home`, `Icons.Filled.Menu`) или **рисуем простые 
-vector drawable**.
+| Иконка | Код | Где | Что |
+|--------|-----|-----|-----|
+| `NewGame` | `Icons.Filled.Add` | Главный | + |
+| `Continue` | `Icons.Filled.PlayArrow` | Главный | ▶ |
+| `Menu` | `Icons.Filled.MoreVert` | Топ-бар | ⋮ |
+| `Close` | `Icons.Filled.Close` | История | × (промах) |
+| `Back` | `Icons.AutoMirrored.Filled.ArrowBack` | Топ-бар | ← |
+| `Increase` | `Icons.Filled.Add` | Счётчик | + |
+
+**Vector drawable (`ImageVector`):**
+
+| Иконка | Файл | Где | Что |
+|--------|------|-----|-----|
+| `Undo` | `ic_undo.xml` | Игровой | ↶ |
+| `Decrease` | `ic_remove.xml` | Счётчик | − |
+
+**PNG drawable (`Painter`):**
+
+| Иконка | Файл | Где | Что |
+|--------|------|-----|-----|
+| `Pocket` | `ic_pocket.png` | История | ● (круг, ЗАБИЛ) |
+| `History` | `ic_history.png` | Главный, игровой | история |
+| `Crown` | `ic_crown.png` | Итоги | корона победителя |
+| `Refresh` | `ic_refresh.png` | Итоги | новая игра |
+| `Home` | `ic_home.png` | Итоги | домик |
+
+**Лого и крупные ассеты (`drawable-nodpi`, PNG):**
+
+| Ресурс | Где | Что |
+|--------|-----|-----|
+| `logo_home.png` | Главный | лого КОЛХОЗ |
+| `logo_topbar.png` | Игровой (TopBar) | горизонтальное К8ЛХОЗ |
+| `home_background.png` | Главный | фон стола |
+| `trophy_green.png` | Итоги | кубок с зелёными лаврами |
 
 ---
 
