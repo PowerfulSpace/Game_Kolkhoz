@@ -283,11 +283,14 @@ private fun PortraitContent(
         )
         Spacer(modifier = Modifier.height(KolhozSpacing.M))
         Column(verticalArrangement = Arrangement.spacedBy(KolhozSpacing.XS)) {
-            players.forEach { player ->
+            val leaderId = players.maxByOrNull { it.score }?.id
+            players.forEachIndexed { index, player ->
                 PlayerRow(
                     name = player.name,
                     score = player.score,
                     isCurrent = player.isCurrent,
+                    number = index + 1,
+                    isLeader = player.id == leaderId,
                 )
             }
         }
@@ -331,11 +334,14 @@ private fun LandscapeContent(
                 color = KolhozColors.TextPrimary,
             )
             Spacer(modifier = Modifier.height(KolhozSpacing.M))
-            players.forEach { player ->
+            val leaderId = players.maxByOrNull { it.score }?.id
+            players.forEachIndexed { index, player ->
                 PlayerRow(
                     name = player.name,
                     score = player.score,
                     isCurrent = player.isCurrent,
+                    number = index + 1,
+                    isLeader = player.id == leaderId,
                 )
             }
         }

@@ -37,6 +37,7 @@ import ru.kolkhoz.ui.components.KolkhozIcons
 import ru.kolkhoz.ui.components.KolhozButton
 import ru.kolkhoz.ui.components.KolhozSecondaryButton
 import ru.kolkhoz.ui.components.KolhozTopBar
+import ru.kolkhoz.ui.components.NumberBadge
 import ru.kolkhoz.ui.components.ScoreText
 import ru.kolkhoz.ui.components.rowScoreStyle
 import ru.kolkhoz.ui.model.PlayerResultUi
@@ -204,11 +205,7 @@ private fun ResultRow(player: PlayerResultUi) {
                 modifier = Modifier.width(24.dp),
             )
         }
-        Text(
-            text = player.place.toString(),
-            style = KolhozTypography.H2,
-            color = KolhozColors.TextSecondary,
-        )
+        NumberBadge(number = player.place, isHighlighted = isWinner)
         Text(
             text = player.name,
             style = KolhozTypography.Body,

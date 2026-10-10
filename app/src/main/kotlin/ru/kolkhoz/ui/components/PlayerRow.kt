@@ -1,9 +1,9 @@
 package ru.kolkhoz.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,14 +30,20 @@ import ru.kolkhoz.ui.theme.KolhozTypography
  * Строка игрока в списке (DESIGN_SYSTEM.md, раздел 9.1).
  *
  * Высота 56dp. Имя — [KolhozTypography.BodyMedium], счёт —
- * [ScoreText] (Body + Bold). Слева — индикатор ●
- * ([KolhozColors.Primary]), только если это текущий игрок;
- * тогда фон [KolhozColors.SurfaceElevated] с границей
+ * [ScoreText] (Body + Bold). Слева — [NumberBadge] с номером
+ * (у текущего игрока — выделенный). У лидера партии перед
+ * именем — корона [KolkhozIcons.Crown]. Текущий игрок
+ * подсвечен фоном [KolhozColors.SurfaceElevated] с границей
  * [KolhozColors.Primary]. Stateless.
+ *
+ * Лидер — игрок с максимальным счётом; при равенстве счётов
+ * корона достаётся первому в списке.
  *
  * @param name Имя игрока.
  * @param score Счёт игрока.
  * @param isCurrent Текущий ли это игрок.
+ * @param number Порядковый номер игрока для [NumberBadge].
+ * @param isLeader Лидер партии (максимальный счёт); корона.
  * @param modifier Модификатор.
  */
 @Composable
@@ -45,7 +51,9 @@ fun PlayerRow(
     name: String,
     score: Int,
     isCurrent: Boolean,
+    number: Int,
     modifier: Modifier = Modifier,
+    isLeader: Boolean = false,
 ) {
     val background = if (isCurrent) {
         KolhozColors.SurfaceElevated
@@ -67,14 +75,15 @@ fun PlayerRow(
             .padding(horizontal = KolhozSpacing.M),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (isCurrent) {
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .background(KolhozColors.Primary),
+        NumberBadge(number = number, isHighlighted = isCurrent)
+        Spacer(modifier = Modifier.width(KolhozSpacing.M))
+        if (isLeader) {
+            Image(
+                painter = KolkhozIcons.Crown,
+                contentDescription = "Лидер",
+                modifier = Modifier.size(20.dp),
             )
-            Spacer(modifier = Modifier.size(KolhozSpacing.M))
+            Spacer(modifier = Modifier.width(KolhozSpacing.S))
         }
         Text(
             text = name,
@@ -90,14 +99,11 @@ fun PlayerRow(
 @Composable
 private fun PlayerRowPreview() {
     KolkhozTheme {
-        Column(
-            modifier = Modifier.padding(KolhozSpacing.L),
-            verticalArrangement = Arrangement.spacedBy(KolhozSpacing.S),
-        ) {
-            PlayerRow(name = "Саша", score = 7, isCurrent = true)
-            PlayerRow(name = "Петя", score = 2, isCurrent = false)
-            PlayerRow(name = "Коля", score = -4, isCurrent = false)
-            PlayerRow(name = "Дима", score = 0, isCurrent = false)
+        Column(verticalArrangement = Arrangement.spacedBy(KolhozSpacing.S)) {
+            PlayerRow(name = "Саша", score = 7, isCurrent = true, number = 1, isLeader = true)
+            PlayerRow(name = "Петя", score = 2, isCurrent = false, number = 2)
+            PlayerRow(name = "Коля", score = -4, isCurrent = false, number = 3)
+            PlayerRow(name = "Дима", score = 0, isCurrent = false, number = 4)
         }
     }
 }

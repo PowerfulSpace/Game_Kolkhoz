@@ -1,13 +1,16 @@
 package ru.kolkhoz.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import ru.kolkhoz.ui.theme.KolhozColors
 import ru.kolkhoz.ui.theme.KolhozSpacing
 import ru.kolkhoz.ui.theme.KolkhozTheme
@@ -16,7 +19,8 @@ import ru.kolkhoz.ui.theme.KolhozTypography
 /**
  * Карточка текущего игрока (DESIGN_SYSTEM.md, раздел 9.2).
  *
- * Блок «ХОДИТ / ИМЯ / СЧЁТ / СЕРИЯ»: статус — Caption,
+ * Блок «корона / ХОДИТ / ИМЯ / СЧЁТ / СЕРИЯ»: корона
+ * [KolkhozIcons.Crown], статус — Caption,
  * имя — [KolhozTypography.PlayerName], счёт — [ScoreText]
  * (Display), серия — [SeriesIndicator] (только если > 0).
  * Фон прозрачный. Stateless.
@@ -38,6 +42,11 @@ fun CurrentPlayerCard(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(KolhozSpacing.XS),
     ) {
+        Image(
+            painter = KolkhozIcons.Crown,
+            contentDescription = null,
+            modifier = Modifier.size(24.dp),
+        )
         Text(
             text = "ХОДИТ",
             style = KolhozTypography.Caption,

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -87,14 +88,8 @@ fun PlayerInput(
                 .padding(start = KolhozSpacing.M, end = KolhozSpacing.XS),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = playerNumber.toString(),
-                style = KolhozTypography.Caption,
-                color = KolhozColors.TextSecondary,
-                modifier = Modifier
-                    .width(24.dp)
-                    .padding(end = KolhozSpacing.S),
-            )
+            NumberBadge(number = playerNumber)
+            Spacer(modifier = Modifier.width(KolhozSpacing.M))
             Box(modifier = Modifier.weight(1f)) {
                 if (value.isEmpty()) {
                     Text(

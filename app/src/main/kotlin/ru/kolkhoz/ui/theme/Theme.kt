@@ -28,6 +28,9 @@ private val KolkhozColorScheme = darkColorScheme(
     onError = KolhozColors.TextPrimary,
     outline = KolhozColors.Border,
     outlineVariant = KolhozColors.Border,
+    inverseSurface = KolhozColors.SurfaceElevated,
+    inverseOnSurface = KolhozColors.TextPrimary,
+    inversePrimary = KolhozColors.Primary,
 )
 
 /** Маппинг токенов [KolhozTypography] на стили Material3. */
