@@ -143,8 +143,20 @@ fun ResultScreen(
                             modifier = Modifier.fillMaxWidth(),
                             verticalArrangement = Arrangement.spacedBy(KolhozSpacing.S),
                         ) {
-                            uiState.players.forEach { player ->
-                                ResultRow(player = player)
+                            val maxScore =
+                                uiState.players.maxOfOrNull { it.score } ?: 0
+                            val leadersCount =
+                                uiState.players.count { it.score == maxScore }
+                            val hasUniqueWinner =
+                                maxScore > 0 && leadersCount == 1
+
+                            uiState.players.forEachIndexed { index, player ->
+                                ResultRow(
+                                    player = player,
+                                    place = index + 1,
+                                    isWinner = hasUniqueWinner &&
+                                        player.score == maxScore,
+                                )
                             }
                         }
 
@@ -172,9 +184,24 @@ fun ResultScreen(
     }
 }
 
+/**
+ * Строка результата игрока: место, имя, счёт.
+ *
+ * Победитель — единственный игрок с максимальным счётом > 0.
+ * При равных max или max == 0 — никто не выделяется как
+ * победитель.
+ *
+ * @param player Игрок (имя, счёт).
+ * @param place Место (1, 2, 3 …).
+ * @param isWinner Выделять ли как победителя (корона, фон,
+ *   рамка, подсветка бейджа).
+ */
 @Composable
-private fun ResultRow(player: PlayerResultUi) {
-    val isWinner = player.place == 1
+private fun ResultRow(
+    player: PlayerResultUi,
+    place: Int,
+    isWinner: Boolean = false,
+) {
     val shape = RoundedCornerShape(KolhozRadius.M)
 
     Row(
@@ -214,7 +241,7 @@ private fun ResultRow(player: PlayerResultUi) {
                 modifier = Modifier.width(24.dp),
             )
         }
-        NumberBadge(number = player.place, isHighlighted = isWinner)
+        NumberBadge(number = place, isHighlighted = isWinner)
         Text(
             text = player.name,
             style = KolhozTypography.Body,
