@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import ru.kolkhoz.R
 import ru.kolkhoz.domain.model.GameStatus
 import ru.kolkhoz.domain.model.PlayerId
@@ -51,7 +52,27 @@ import ru.kolkhoz.ui.theme.KolhozTypography
 
 private const val UNDO_MESSAGE = "Удар отменён"
 private const val UNDO_ACTION = "ВЕРНУТЬ"
+private const val UNDO_SNACKBAR_MILLIS = 2000L
 private const val GAME_NOT_FOUND_MESSAGE = "Партия не найдена"
+
+/**
+ * Единственный лидер партии для короны (Bug 4).
+ *
+ * Корона показывается ТОЛЬКО если есть один игрок с максимальным
+ * счётом и этот счёт > 0:
+ * - все на 0 → никому (`null`);
+ * - двое с одинаковым max > 0 → никому (`null`);
+ * - один с max > 0 → он лидер.
+ *
+ * @param players Список игроков партии.
+ * @return id единственного лидера или `null`, если короны нет.
+ */
+private fun uniqueLeaderId(players: List<PlayerUi>): PlayerId? {
+    val maxScore = players.maxOfOrNull { it.score } ?: return null
+    if (maxScore <= 0) return null
+    val leaders = players.filter { it.score == maxScore }
+    return leaders.singleOrNull()?.id
+}
 
 /**
  * Игровой экран (UI_SPEC.md, разделы 4 и 4.6).
@@ -66,7 +87,8 @@ private const val GAME_NOT_FOUND_MESSAGE = "Партия не найдена"
  * - иначе — игровой контент.
  *
  * Snackbar: после undo — «Удар отменён» с action «ВЕРНУТЬ»
- * (redo, UI_SPEC 9.1); ошибки из `uiState.errorMessage`.
+ * (redo, UI_SPEC 9.1), длительность 2 сек ([UNDO_SNACKBAR_MILLIS]);
+ * ошибки из `uiState.errorMessage`.
  *
  * Stateless: принимает UI-state целиком и callbacks.
  *
@@ -140,12 +162,20 @@ fun GameScreen(
                 onUndo = {
                     onUndo()
                     // UI_SPEC 9.1: undo → snackbar c «ВЕРНУТЬ» (redo).
+                    // SnackbarDuration в material3: Short = 4000ms,
+                    // Long = 10000ms — кастомной нет. Нужно 2000ms:
+                    // Indefinite + withTimeoutOrNull; по таймауту
+                    // showSnackbar отменяется, finally в
+                    // SnackbarHostState стирает currentSnackbarData
+                    // → снекбар закрывается сам.
                     scope.launch {
-                        val result = snackbarHostState.showSnackbar(
-                            message = UNDO_MESSAGE,
-                            actionLabel = UNDO_ACTION,
-                            duration = SnackbarDuration.Short,
-                        )
+                        val result = withTimeoutOrNull(UNDO_SNACKBAR_MILLIS) {
+                            snackbarHostState.showSnackbar(
+                                message = UNDO_MESSAGE,
+                                actionLabel = UNDO_ACTION,
+                                duration = SnackbarDuration.Indefinite,
+                            )
+                        }
                         if (result == SnackbarResult.ActionPerformed) {
                             onRedo()
                         }
@@ -268,11 +298,13 @@ private fun PortraitContent(
             .fillMaxWidth()
             .padding(KolhozSpacing.L),
     ) {
+        val leaderId = uniqueLeaderId(players)
         if (current != null) {
             CurrentPlayerCard(
                 playerName = current.name,
                 score = current.score,
                 series = currentStreak,
+                isLeader = current.id == leaderId,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -283,7 +315,6 @@ private fun PortraitContent(
         )
         Spacer(modifier = Modifier.height(KolhozSpacing.M))
         Column(verticalArrangement = Arrangement.spacedBy(KolhozSpacing.XS)) {
-            val leaderId = players.maxByOrNull { it.score }?.id
             players.forEachIndexed { index, player ->
                 PlayerRow(
                     name = player.name,
@@ -327,6 +358,7 @@ private fun LandscapeContent(
             .padding(KolhozSpacing.L),
     ) {
         // Левая колонка — список игроков.
+        val leaderId = uniqueLeaderId(players)
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = "ИГРОКИ",
@@ -334,7 +366,6 @@ private fun LandscapeContent(
                 color = KolhozColors.TextPrimary,
             )
             Spacer(modifier = Modifier.height(KolhozSpacing.M))
-            val leaderId = players.maxByOrNull { it.score }?.id
             players.forEachIndexed { index, player ->
                 PlayerRow(
                     name = player.name,
@@ -360,6 +391,7 @@ private fun LandscapeContent(
                     playerName = current.name,
                     score = current.score,
                     series = currentStreak,
+                    isLeader = current.id == leaderId,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }

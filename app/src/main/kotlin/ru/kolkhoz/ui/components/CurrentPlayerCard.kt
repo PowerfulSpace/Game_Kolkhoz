@@ -20,7 +20,8 @@ import ru.kolkhoz.ui.theme.KolhozTypography
  * Карточка текущего игрока (DESIGN_SYSTEM.md, раздел 9.2).
  *
  * Блок «корона / ХОДИТ / ИМЯ / СЧЁТ / СЕРИЯ»: корона
- * [KolkhozIcons.Crown], статус — Caption,
+ * [KolkhozIcons.Crown] показывается ТОЛЬКО если текущий игрок —
+ * единственный лидер партии (см. [isLeader]); статус — Caption,
  * имя — [KolhozTypography.PlayerName], счёт — [ScoreText]
  * (Display), серия — [SeriesIndicator] (только если > 0).
  * Фон прозрачный. Stateless.
@@ -28,6 +29,9 @@ import ru.kolkhoz.ui.theme.KolhozTypography
  * @param playerName Имя текущего игрока.
  * @param score Счёт текущего игрока.
  * @param series Текущая серия (0 — индикатор не показывается).
+ * @param isLeader Текущий игрок — единственный лидер партии
+ *   (максимальный счёт > 0); показывает корону. Иначе корона
+ *   скрыта. Правило то же, что в [PlayerRow].
  * @param modifier Модификатор.
  */
 @Composable
@@ -36,17 +40,20 @@ fun CurrentPlayerCard(
     score: Int,
     series: Int,
     modifier: Modifier = Modifier,
+    isLeader: Boolean = false,
 ) {
     Column(
         modifier = modifier.padding(vertical = KolhozSpacing.M),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(KolhozSpacing.XS),
     ) {
-        Image(
-            painter = KolkhozIcons.Crown,
-            contentDescription = null,
-            modifier = Modifier.size(24.dp),
-        )
+        if (isLeader) {
+            Image(
+                painter = KolkhozIcons.Crown,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+            )
+        }
         Text(
             text = "ХОДИТ",
             style = KolhozTypography.Caption,
@@ -68,6 +75,11 @@ fun CurrentPlayerCard(
 @Composable
 private fun CurrentPlayerCardPreview() {
     KolkhozTheme {
-        CurrentPlayerCard(playerName = "САША", score = 7, series = 4)
+        CurrentPlayerCard(
+            playerName = "САША",
+            score = 7,
+            series = 4,
+            isLeader = true,
+        )
     }
 }

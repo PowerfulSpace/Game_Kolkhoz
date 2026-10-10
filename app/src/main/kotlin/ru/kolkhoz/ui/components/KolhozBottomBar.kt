@@ -56,6 +56,10 @@ fun KolhozBottomBar(
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp)
+            // Внешний отступ — чтобы рамка панели была на уровне
+            // кнопок «ЗАБИЛ»/«ПРОМАХ» (Bug 2). padding → border
+            // → внутренний padding.
+            .padding(horizontal = KolhozSpacing.L)
             .background(KolhozColors.Background)
             .border(
                 width = 1.dp,

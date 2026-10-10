@@ -36,14 +36,18 @@ import ru.kolkhoz.ui.theme.KolhozTypography
  * подсвечен фоном [KolhozColors.SurfaceElevated] с границей
  * [KolhozColors.Primary]. Stateless.
  *
- * Лидер — игрок с максимальным счётом; при равенстве счётов
- * корона достаётся первому в списке.
+ * Лидер — ТОЛЬКО игрок с максимальным счётом, если этот счёт > 0
+ * и максимум принадлежит одному игроку:
+ * - все на 0 → короны нет;
+ * - двое с одинаковым max > 0 → короны нет;
+ * - один с max > 0 → корона у него.
  *
  * @param name Имя игрока.
  * @param score Счёт игрока.
  * @param isCurrent Текущий ли это игрок.
  * @param number Порядковый номер игрока для [NumberBadge].
- * @param isLeader Лидер партии (максимальный счёт); корона.
+ * @param isLeader Единственный лидер партии (макс. счёт > 0);
+ *   корона.
  * @param modifier Модификатор.
  */
 @Composable
@@ -67,10 +71,20 @@ fun PlayerRow(
             .height(56.dp)
             .clip(RoundedCornerShape(KolhozRadius.S))
             .background(background)
-            .border(
-                width = if (isCurrent) 1.dp else 0.dp,
-                color = KolhozColors.Primary,
-                shape = RoundedCornerShape(KolhozRadius.S),
+            // Рамка только у текущего игрока. ВАЖНО: не передавать
+            // border(width = 0.dp) — 0-width stroke на Android
+            // рисуется hairline (1px) и обрезается clip'ом
+            // (неполный овал у не-текущих строк, Bug 3).
+            .then(
+                if (isCurrent) {
+                    Modifier.border(
+                        width = 1.dp,
+                        color = KolhozColors.Primary,
+                        shape = RoundedCornerShape(KolhozRadius.S),
+                    )
+                } else {
+                    Modifier
+                },
             )
             .padding(horizontal = KolhozSpacing.M),
         verticalAlignment = Alignment.CenterVertically,

@@ -188,10 +188,19 @@ private fun ResultRow(player: PlayerResultUi) {
                     KolhozColors.Surface
                 },
             )
-            .border(
-                width = if (isWinner) 1.dp else 0.dp,
-                color = KolhozColors.Primary,
-                shape = shape,
+            // Рамка только у победителя. Не border(0.dp) —
+            // 0-width stroke рисуется hairline и обрезается
+            // clip'ом (неполный овал, Bug 3).
+            .then(
+                if (isWinner) {
+                    Modifier.border(
+                        width = 1.dp,
+                        color = KolhozColors.Primary,
+                        shape = shape,
+                    )
+                } else {
+                    Modifier
+                },
             )
             .padding(KolhozSpacing.L),
         verticalAlignment = Alignment.CenterVertically,

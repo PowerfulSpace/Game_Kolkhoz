@@ -1,5 +1,6 @@
 package ru.kolkhoz.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -41,9 +42,12 @@ import ru.kolkhoz.ui.theme.KolhozTypography
  * @param text Текст кнопки.
  * @param onClick Колбэк нажатия.
  * @param enabled Активна ли кнопка.
- * @param leadingIcon Необязательная иконка слева от текста.
+ * @param leadingIcon Необязательная иконка слева от текста
+ *   (векторная, tint = цвет текста).
  * @param leadingPainter Необязательная растровая иконка (PNG)
- *   слева от текста; альтернатива [leadingIcon].
+ *   слева от текста; рисуется как есть, БЕЗ tint (иначе
+ *   PNG закрашивается целиком). Если переданы оба параметра —
+ *   приоритет у [leadingPainter].
  * @param modifier Модификатор.
  */
 @Composable
@@ -92,17 +96,18 @@ fun KolhozButton(
             color = textColor,
         )
         // Иконка — слева от центра, если есть.
+        // PNG (leadingPainter) — без tint, иначе PNG закрасится
+        // целиком; вектор (leadingIcon) — с tint цвета текста.
         when {
-            leadingIcon != null -> Icon(
-                imageVector = leadingIcon,
+            leadingPainter != null -> Image(
+                painter = leadingPainter,
                 contentDescription = null,
-                tint = textColor,
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .size(24.dp),
             )
-            leadingPainter != null -> Icon(
-                painter = leadingPainter,
+            leadingIcon != null -> Icon(
+                imageVector = leadingIcon,
                 contentDescription = null,
                 tint = textColor,
                 modifier = Modifier
